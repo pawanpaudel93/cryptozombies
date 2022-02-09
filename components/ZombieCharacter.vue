@@ -1,115 +1,125 @@
 <template>
   <client-only>
     <div v-images-loaded="zombieLoaded" class="zombie-char">
-      <div class="zombie-preview mx-auto">
-        <div
-          v-show="!isZombieLoaded"
-          class="zombie-loading zombie-loading-parts"
-        ></div>
-        <div v-show="isZombieLoaded" class="zombie-parts" :class="partsVisible">
-          <img
-            v-show="!catMode"
-            :style="clothesColor"
-            class="left-feet"
-            src="@/assets/images/zombieparts/left-feet-1@2x.png"
-          />
-          <img
-            v-show="!catMode"
-            :style="clothesColor"
-            class="right-feet"
-            src="@/assets/images/zombieparts/right-feet-1@2x.png"
-          />
+      <v-badge overlap bordered color="red" :content="zombie.level">
+        <div class="zombie-preview mx-auto">
+          <div
+            v-show="!isZombieLoaded"
+            class="zombie-loading zombie-loading-parts"
+          ></div>
 
-          <img
-            v-show="!catMode"
-            :style="clothesColor"
-            class="left-leg"
-            src="@/assets/images/zombieparts/left-leg-1@2x.png"
-          />
-          <img
-            v-show="!catMode"
-            :style="clothesColor"
-            class="right-leg"
-            src="@/assets/images/zombieparts/right-leg-1@2x.png"
-          />
+          <div
+            v-show="isZombieLoaded"
+            class="zombie-parts"
+            :class="partsVisible"
+          >
+            <img
+              v-show="!catMode"
+              :style="clothesColor"
+              class="left-feet"
+              src="@/assets/images/zombieparts/left-feet-1@2x.png"
+            />
+            <img
+              v-show="!catMode"
+              :style="clothesColor"
+              class="right-feet"
+              src="@/assets/images/zombieparts/right-feet-1@2x.png"
+            />
 
-          <img
-            v-show="!catMode"
-            :style="clothesColor"
-            class="left-thigh"
-            src="@/assets/images/zombieparts/left-thigh-1@2x.png"
-          />
-          <img
-            v-show="!catMode"
-            :style="clothesColor"
-            class="right-thigh"
-            src="@/assets/images/zombieparts/right-thigh-1@2x.png"
-          />
+            <img
+              v-show="!catMode"
+              :style="clothesColor"
+              class="left-leg"
+              src="@/assets/images/zombieparts/left-leg-1@2x.png"
+            />
+            <img
+              v-show="!catMode"
+              :style="clothesColor"
+              class="right-leg"
+              src="@/assets/images/zombieparts/right-leg-1@2x.png"
+            />
 
-          <img
-            :style="headColor"
-            class="left-forearm"
-            src="@/assets/images/zombieparts/left-forearm-1@2x.png"
-          />
-          <img
-            :style="headColor"
-            class="right-forearm"
-            src="@/assets/images/zombieparts/right-forearm-1@2x.png"
-          />
+            <img
+              v-show="!catMode"
+              :style="clothesColor"
+              class="left-thigh"
+              src="@/assets/images/zombieparts/left-thigh-1@2x.png"
+            />
+            <img
+              v-show="!catMode"
+              :style="clothesColor"
+              class="right-thigh"
+              src="@/assets/images/zombieparts/right-thigh-1@2x.png"
+            />
 
-          <img
-            :style="headColor"
-            class="right-upper-arm"
-            src="@/assets/images/zombieparts/right-upper-arm-1@2x.png"
-          />
+            <img
+              :style="headColor"
+              class="left-forearm"
+              src="@/assets/images/zombieparts/left-forearm-1@2x.png"
+            />
+            <img
+              :style="headColor"
+              class="right-forearm"
+              src="@/assets/images/zombieparts/right-forearm-1@2x.png"
+            />
 
-          <img
-            :style="clothesColor"
-            class="torso"
-            src="@/assets/images/zombieparts/torso-1@2x.png"
-          />
+            <img
+              :style="headColor"
+              class="right-upper-arm"
+              src="@/assets/images/zombieparts/right-upper-arm-1@2x.png"
+            />
 
-          <img
-            v-show="catMode"
-            :style="clothesColor"
-            class="cat-legs"
-            src="@/assets/images/zombieparts/catlegs.png"
-          />
-          <img :style="clothesColor" :class="shirtClass" :src="shirtSrc" />
+            <img
+              :style="clothesColor"
+              class="torso"
+              src="@/assets/images/zombieparts/torso-1@2x.png"
+            />
 
-          <img
-            :style="headColor"
-            class="left-upper-arm"
-            src="@/assets/images/zombieparts/left-upper-arm-1@2x.png"
-          />
+            <img
+              v-show="catMode"
+              :style="clothesColor"
+              class="cat-legs"
+              src="@/assets/images/zombieparts/catlegs.png"
+            />
+            <img :style="clothesColor" :class="shirtClass" :src="shirtSrc" />
 
-          <img
-            :style="headColor"
-            class="left-forearm"
-            src="@/assets/images/zombieparts/left-forearm-1@2x.png"
-          />
-          <img
-            :style="headColor"
-            class="right-forearm"
-            src="@/assets/images/zombieparts/right-forearm-1@2x.png"
-          />
+            <img
+              :style="headColor"
+              class="left-upper-arm"
+              src="@/assets/images/zombieparts/left-upper-arm-1@2x.png"
+            />
 
-          <img
-            :style="headColor"
-            class="left-hand"
-            src="@/assets/images/zombieparts/hand1-1@2x.png"
-          />
-          <img
-            :style="headColor"
-            class="right-hand"
-            src="@/assets/images/zombieparts/hand-2-1@2x.png"
-          />
+            <img
+              :style="headColor"
+              class="left-forearm"
+              src="@/assets/images/zombieparts/left-forearm-1@2x.png"
+            />
+            <img
+              :style="headColor"
+              class="right-forearm"
+              src="@/assets/images/zombieparts/right-forearm-1@2x.png"
+            />
 
-          <img :style="headColor" :class="headClass" :src="headSrc" />
-          <img :style="eyeColor" :class="eyeClass" :src="eyeSrc" />
-          <img class="mouth" src="@/assets/images/zombieparts/mouth-1@2x.png" />
+            <img
+              :style="headColor"
+              class="left-hand"
+              src="@/assets/images/zombieparts/hand1-1@2x.png"
+            />
+            <img
+              :style="headColor"
+              class="right-hand"
+              src="@/assets/images/zombieparts/hand-2-1@2x.png"
+            />
+
+            <img :style="headColor" :class="headClass" :src="headSrc" />
+            <img :style="eyeColor" :class="eyeClass" :src="eyeSrc" />
+            <img
+              class="mouth"
+              src="@/assets/images/zombieparts/mouth-1@2x.png"
+            />
+          </div>
         </div>
-      </div>
+      </v-badge>
     </div>
   </client-only>
 </template>
@@ -445,5 +455,15 @@ export default class ZombieCharacter extends Vue {
 
 .zombie-name {
   font-weight: bold;
+}
+</style>
+
+<style>
+.v-badge__badge {
+  top: 115px !important;
+  left: 30px !important;
+  height: 25px !important;
+  min-width: 25px !important;
+  font-size: 16px !important;
 }
 </style>
