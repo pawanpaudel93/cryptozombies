@@ -1,6 +1,6 @@
 import { BigNumber } from "ethers"
 
-export type Zombie = {
+export interface Zombie {
     id: BigNumber
     name: string
     dna: BigNumber

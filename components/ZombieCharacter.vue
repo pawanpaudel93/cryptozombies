@@ -1,8 +1,13 @@
 <template>
   <client-only>
     <div v-images-loaded="zombieLoaded" class="zombie-char">
-      <v-badge overlap bordered color="red" :content="zombie.level">
-        <div class="zombie-preview mx-auto">
+      <div class="zombie-preview mx-auto">
+        <v-badge
+          overlap
+          bordered
+          color="red"
+          :content="'Level: ' + zombie.level"
+        >
           <div
             v-show="!isZombieLoaded"
             class="zombie-loading zombie-loading-parts"
@@ -118,8 +123,8 @@
               src="@/assets/images/zombieparts/mouth-1@2x.png"
             />
           </div>
-        </div>
-      </v-badge>
+        </v-badge>
+      </div>
     </div>
   </client-only>
 </template>
@@ -460,7 +465,7 @@ export default class ZombieCharacter extends Vue {
 
 <style>
 .v-badge__badge {
-  top: 115px !important;
+  top: 100px !important;
   left: 30px !important;
   height: 25px !important;
   min-width: 25px !important;

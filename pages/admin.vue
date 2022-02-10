@@ -1,5 +1,5 @@
 <template>
-  <v-container>
+  <v-container fluid>
     <v-card>
       <v-card-title>Admin Settings</v-card-title>
       <v-card-text>

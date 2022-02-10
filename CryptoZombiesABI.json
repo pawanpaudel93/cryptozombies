@@ -28,6 +28,12 @@
         "anonymous": false,
         "inputs": [
             {
+                "indexed": true,
+                "internalType": "address",
+                "name": "creator",
+                "type": "address"
+            },
+            {
                 "indexed": false,
                 "internalType": "uint256",
                 "name": "zombieId",
@@ -302,7 +308,7 @@
                         "type": "uint16"
                     }
                 ],
-                "internalType": "struct ZombieFactory.Zombie[]",
+                "internalType": "struct ZombieFactory.Array<Zombie>",
                 "name": "",
                 "type": "tuple[]"
             }

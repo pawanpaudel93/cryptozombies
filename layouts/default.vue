@@ -2,7 +2,7 @@
   <v-app>
     <Header />
     <v-main>
-      <v-container v-if="isChainSupported && isConnected">
+      <v-container v-if="isChainSupported && isConnected" fluid class="px-10">
         <Nuxt />
       </v-container>
       <v-container v-else-if="isChainSupported && !isConnected">
@@ -17,13 +17,15 @@
 
 <script lang="ts">
 import { Vue, Component, namespace } from 'nuxt-property-decorator'
-import { provider } from '~/plugins/provider'
+import { provider, getCryptoZombiesContract } from '~/plugins/provider'
 import Header from '@/components/Header.vue'
 import NotConnected from '@/components/NotConnected.vue'
 import InvalidChain from '@/components/InvalidChain.vue'
+import { Zombie } from '~/interfaces/zombie'
 declare let window: any
 
 const wallet = namespace('wallet')
+const zombie = namespace('zombie')
 
 @Component({
   components: {
@@ -54,13 +56,29 @@ export default class Default extends Vue {
   @wallet.Mutation
   public setChainSupported!: (supported: boolean) => void
 
-  async mounted() {
-    window.ethereum.on('accountsChanged', (account: string[]) => {
-      if (account) {
-        this.setConnectedAddress(account[0])
-        // this.$nuxt.$emit('fetchBalance')
+  @zombie.Mutation
+  setZombies!: (zombies: Array<Zombie>) => void
+
+  async loadZombies() {
+    try {
+      const signer = await provider.getSigner()
+      const cryptoZombieContract = getCryptoZombiesContract(signer)
+      const zombies = await cryptoZombieContract.getZombiesByOwner(
+        this.connectedAddress
+      )
+      this.setZombies(zombies)
+    } catch (e) {
+      this.setZombies([])
+    }
+  }
+
+  startListeners() {
+    window.ethereum.on('accountsChanged', (accounts: string[]) => {
+      if (accounts.length > 0) {
+        this.setConnectedAddress(accounts[0])
+        this.setConnected(true)
+        this.loadZombies()
       } else {
-        this.setConnectedAddress('')
         this.setConnected(false)
       }
     })
@@ -81,9 +99,11 @@ export default class Default extends Vue {
         this.setChainSupported(false)
         this.setConnected(false)
       }
-      // this.$nuxt.$emit('fetchBalance')
+      this.loadZombies()
     })
+  }
 
+  async autoConnect() {
     try {
       const signer = this.connectedAddress
         ? await provider.getSigner(this.connectedAddress)
@@ -92,6 +112,7 @@ export default class Default extends Vue {
       if (chainId && signer && this.supportedChainIds.includes(chainId)) {
         this.setConnectedAddress(await signer.getAddress())
         this.setConnected(true)
+        this.loadZombies()
       } else {
         this.setChainSupported(false)
         this.setConnected(false)
@@ -99,6 +120,15 @@ export default class Default extends Vue {
     } catch (e) {
       this.setConnected(false)
     }
+  }
+
+  mounted() {
+    this.startListeners()
+    this.autoConnect()
+
+    this.$nuxt.$on('loadZombies', () => {
+      this.loadZombies()
+    })
   }
 }
 </script>

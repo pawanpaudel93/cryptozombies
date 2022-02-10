@@ -24,10 +24,10 @@ export default class Home extends Vue {
   cryptoZombieContract: Contract = getCryptoZombiesContract()
 
   @zombie.State
-  zombies!: Zombie[]
+  zombies!: Array<Zombie>
 
   @zombie.Mutation
-  setZombies!: (zombies: Zombie[]) => void
+  setZombies!: (zombies: Array<Zombie>) => void
 
   async mounted() {
     try {

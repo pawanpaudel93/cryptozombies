@@ -1,5 +1,5 @@
 <template>
-  <v-container>
+  <v-container fluid>
     <div>
       <v-btn text to="/zombies"
         ><v-icon large>mdi-arrow-left-bold</v-icon></v-btn
@@ -8,71 +8,131 @@
     <div class="text-center">
       <h3>#{{ zombie.id }} {{ zombie.name }}</h3>
     </div>
-    <v-row class="mb-5">
-      <v-col cols="12" sm="6">
+    <v-row v-if="isOwner" class="mb-5">
+      <v-col cols="12" md="4">
         <zombie-character :zombie="zombie"></zombie-character>
       </v-col>
-      <v-col cols="12" sm="6">
-        <div
-          :style="
-            $vuetify.breakpoint.smAndUp
-              ? 'margin-top: 150px'
-              : 'margin-top: 10px'
-          "
-          class="text-center"
-        >
-          <h4>Feed on Crypto Kitties</h4>
-          <v-text-field
-            v-model="kittyId"
-            label="Kitty ID"
-            :rules="[(v) => !!v || 'Kitty ID is required']"
-          >
-          </v-text-field>
+      <v-col cols="12" md="8">
+        <v-row class="mt-12">
+          <v-col md="6" cols="12" class="text-center px-12 py-6">
+            <v-form ref="feed" @submit.prevent="feed">
+              <h4>Feed on Crypto Kitties</h4>
+              <v-text-field
+                v-model="kittyId"
+                label="Kitty ID"
+                :rules="[(v) => !!v || 'Kitty ID is required']"
+              >
+              </v-text-field>
 
-          <v-btn
-            color="blue"
-            :loading="isLoading"
-            :disabled="isLoading || !isReady"
-            @click="feed"
-            >{{ isReady ? 'Feed' : 'Not Ready to Feed' }}</v-btn
-          >
-        </div>
+              <v-btn
+                color="blue"
+                :loading="feedLoading"
+                :disabled="feedLoading || !isReady"
+                type="submit"
+                >{{ isReady ? 'Feed' : 'Not Ready to Feed' }}</v-btn
+              >
+            </v-form>
+          </v-col>
 
-        <div class="text-center mt-6">
-          <h4>Attack another Crypto Zombie</h4>
-          <v-text-field
-            v-model="zombieId"
-            label="Zombie ID"
-            :rules="[(v) => !!v || 'Zombie ID is required']"
-          >
-          </v-text-field>
-          <v-btn
-            color="blue"
-            :loading="isLoading"
-            :disabled="isLoading || !isReady"
-            @click="attack"
-            >{{ isReady ? 'Attack' : 'Not Ready to Attack' }}</v-btn
-          >
-        </div>
+          <v-col md="6" cols="12" class="text-center px-12 py-6">
+            <v-form ref="attack" @submit.prevent="attack">
+              <h4>Attack another Crypto Zombie</h4>
+              <v-text-field
+                v-model="zombieId"
+                label="Zombie ID"
+                :rules="[(v) => !!v || 'Zombie ID is required']"
+              >
+              </v-text-field>
+              <v-btn
+                color="blue"
+                :loading="attackLoading"
+                :disabled="attackLoading || !isReady"
+                type="submit"
+                >{{ isReady ? 'Attack' : 'Not Ready to Attack' }}</v-btn
+              >
+            </v-form>
+          </v-col>
+          <v-col md="6" cols="12" class="text-center px-12 py-6">
+            <v-form ref="name" @submit.prevent="changeName">
+              <h4>Change your Zombie Name</h4>
+              <v-text-field
+                v-model="name"
+                label="New Zombie Name"
+                :rules="[(v) => !!v || 'Zombie Name is required']"
+              >
+              </v-text-field>
+              <v-btn
+                color="blue"
+                :loading="nameLoading"
+                :disabled="nameLoading || zombie.level < 2"
+                type="submit"
+                >{{
+                  zombie.level >= 2 ? 'Change' : 'Level must be >= 2'
+                }}</v-btn
+              >
+            </v-form>
+          </v-col>
+          <v-col md="6" cols="12" class="text-center px-12 py-6">
+            <v-form ref="dna" @submit.prevent="changeDNA">
+              <h4>Change your Zombie DNA</h4>
+              <v-text-field
+                v-model="dna"
+                maxlength="16"
+                minlength="16"
+                label="New Zombie DNA"
+                :rules="[
+                  (v) => !!v || 'Zombie DNA is required',
+                  (v) => v.length === 16 || 'Zombie DNA must be 16 numbers',
+                  (v) => /^[0-9]+$/.test(v) || 'Zombie DNA must be numbers',
+                ]"
+              >
+              </v-text-field>
+              <v-btn
+                color="blue"
+                :loading="dnaLoading"
+                :disabled="dnaLoading || zombie.level < 20"
+                type="submit"
+                >{{
+                  zombie.level >= 20 ? 'Change' : 'Level must be >= 20'
+                }}</v-btn
+              >
+            </v-form>
+          </v-col>
+          <v-col md="6" cols="12" class="text-center px-12 py-6">
+            <h4>Level up your Zombie Level</h4>
+            <v-btn
+              color="blue"
+              :loading="levelLoading"
+              :disabled="levelLoading"
+              @click="levelUp"
+              >Level Up</v-btn
+            >
+          </v-col>
+        </v-row>
       </v-col>
     </v-row>
+    <zombie-character v-else :zombie="zombie"></zombie-character>
     <v-card outlined shaped elevation="24" class="mt-3" align="center">
       <v-card-text>
         <v-row>
-          <v-col cols="6">ID: </v-col>
-          <v-col cols="6">{{ zombie.id }}</v-col>
-          <v-col cols="6">Name: </v-col>
-          <v-col cols="6">{{ zombie.name }}</v-col>
-          <v-col cols="6">DNA: </v-col>
-          <v-col cols="6">{{ zombie.dna }}</v-col>
-          <v-col cols="6">Level: </v-col>
-          <v-col cols="6">{{ zombie.level }}</v-col>
-          <v-col cols="6">Win Count: </v-col>
-          <v-col cols="6">{{ zombie.winCount }}</v-col>
-          <v-col cols="6">Loss Count: </v-col>
-          <v-col cols="6">{{ zombie.lossCount }}</v-col>
+          <v-col cols="6" class="font-weight-medium">ID: </v-col>
+          <v-col cols="6" class="font-weight-bold">{{ zombie.id }}</v-col>
+          <v-col cols="6" class="font-weight-medium">Name: </v-col>
+          <v-col cols="6" class="font-weight-bold">{{ zombie.name }}</v-col>
+          <v-col cols="6" class="font-weight-medium">DNA: </v-col>
+          <v-col cols="6" class="font-weight-bold">{{ zombie.dna }}</v-col>
+          <v-col cols="6" class="font-weight-medium">Level: </v-col>
+          <v-col cols="6" class="font-weight-bold">{{ zombie.level }}</v-col>
+          <v-col cols="6" class="font-weight-medium">Win Count: </v-col>
+          <v-col cols="6" class="font-weight-bold">{{ zombie.winCount }}</v-col>
+          <v-col cols="6" class="font-weight-medium">Loss Count: </v-col>
+          <v-col cols="6" class="font-weight-bold">{{
+            zombie.lossCount
+          }}</v-col>
           <v-col cols="6">Ready Time: </v-col>
-          <v-col cols="6">{{ new Date(zombie.readyTime * 1000) }}</v-col>
+          <v-col cols="6" class="font-weight-bold">{{
+            new Date(zombie.readyTime * 1000)
+          }}</v-col>
         </v-row>
       </v-card-text>
     </v-card>
@@ -90,8 +150,8 @@
 
 <script lang="ts">
 import { BigNumber } from '@ethersproject/bignumber'
-import { Contract } from 'ethers'
-import { Vue, Component, namespace } from 'nuxt-property-decorator'
+import { Contract, utils } from 'ethers'
+import { Vue, Component, Ref, namespace } from 'nuxt-property-decorator'
 import { provider, getCryptoZombiesContract } from '~/plugins/provider'
 import ZombieCharacter from '~/components/ZombieCharacter.vue'
 import { Zombie } from '~/interfaces/zombie'
@@ -104,11 +164,20 @@ const zombie = namespace('zombie')
   },
 })
 export default class Home extends Vue {
+  feedLoading: boolean = false
+  attackLoading: boolean = false
+  nameLoading: boolean = false
+  dnaLoading: boolean = false
+  levelLoading: boolean = false
+
   kittyId: number = 0
   zombieId: number = 0
-  isLoading: boolean = false
+  name: string = ''
+  dna: string = ''
+
   snackbar: boolean = false
   snackbarText: string = ''
+  isOwner: boolean = false
   cryptoZombieContract: Contract = getCryptoZombiesContract()
   zombie: Zombie = {
     id: BigNumber.from(-1),
@@ -120,17 +189,34 @@ export default class Home extends Vue {
     readyTime: Date.now() / 1000,
   }
 
+  @Ref('feed')
+  feedForm!: HTMLFormElement
+
+  @Ref('attack')
+  attackForm!: HTMLFormElement
+
+  @Ref('name')
+  nameForm!: HTMLFormElement
+
+  @Ref('dna')
+  dnaForm!: HTMLFormElement
+
   @zombie.State
-  zombies!: Zombie[]
+  zombies!: Array<Zombie>
+
+  @zombie.Mutation
+  updateZombie!: (update: { id: BigNumber; data: object }) => void
 
   async feed() {
+    if (!this.feedForm.validate()) return
     try {
-      this.isLoading = true
+      this.feedLoading = true
       const feedTx = await this.cryptoZombieContract.feedOnKitty(
         this.zombie.id,
         this.kittyId
       )
-      feedTx.wait()
+      await feedTx.wait()
+      this.feedForm.reset()
       this.snackbarText =
         "You've successfully fed on the Crypto Kitty #" + this.kittyId
     } catch (e) {
@@ -138,17 +224,19 @@ export default class Home extends Vue {
         "You've failed to feed on the Crypto Kitty #" + this.kittyId
       console.log('feed', e)
     }
-    this.isLoading = false
+    this.feedLoading = false
   }
 
   async attack() {
+    if (!this.attackForm.validate()) return
     try {
-      this.isLoading = true
-      const feedTx = await this.cryptoZombieContract.attack(
+      this.attackLoading = true
+      const attackTx = await this.cryptoZombieContract.attack(
         this.zombie.id,
         this.zombieId
       )
-      feedTx.wait()
+      await attackTx.wait()
+      this.attackForm.reset()
       this.snackbarText =
         "You've successfully attacked the Crypto Zombie #" + this.zombieId
     } catch (e) {
@@ -156,7 +244,86 @@ export default class Home extends Vue {
         "You've failed to attack the Crypto Zombie #" + this.zombieId
       console.log('feed', e)
     }
-    this.isLoading = false
+    this.attackLoading = false
+  }
+
+  async changeName() {
+    if (!this.nameForm.validate()) return
+    try {
+      this.nameLoading = true
+      const nameTx = await this.cryptoZombieContract.changeName(
+        this.zombie.id,
+        this.name
+      )
+      await nameTx.wait()
+      this.updateZombie({
+        id: this.zombie.id,
+        data: { name: this.name },
+      })
+      this.zombie.name = this.name
+      this.nameForm.reset()
+      this.snackbarText =
+        "You've successfully changed the name of the Crypto Zombie #" +
+        this.zombie.id
+    } catch (e) {
+      this.snackbarText =
+        "You've failed to change the name of the Crypto Zombie #" +
+        this.zombie.id
+      console.log('feed', e)
+    }
+    this.nameLoading = false
+  }
+
+  async changeDNA() {
+    if (!this.dnaForm.validate()) return
+    try {
+      this.dnaLoading = true
+      const nameTx = await this.cryptoZombieContract.changeDna(
+        this.zombie.id,
+        this.dna
+      )
+      await nameTx.wait()
+      this.updateZombie({
+        id: this.zombie.id,
+        data: { dna: BigNumber.from(this.dna) },
+      })
+      this.zombie.dna = BigNumber.from(this.dna)
+      this.dnaForm.reset()
+      this.snackbarText =
+        "You've successfully changed the DNA of the Crypto Zombie #" +
+        this.zombie.id
+    } catch (e) {
+      this.snackbarText =
+        "You've failed to change the DNA of the Crypto Zombie #" +
+        this.zombie.id
+      console.log('feed', e)
+    }
+    this.dnaLoading = false
+  }
+
+  async levelUp() {
+    try {
+      this.levelLoading = true
+      const levelUpTx = await this.cryptoZombieContract.levelUp(
+        this.zombie.id,
+        {
+          value: utils.parseEther('0.001'),
+        }
+      )
+      await levelUpTx.wait()
+      this.updateZombie({
+        id: this.zombie.id,
+        data: { level: this.zombie.level + 1 },
+      })
+      this.zombie.level++
+      this.snackbarText =
+        "You've successfully leveled up the Crypto Zombie #" + this.zombieId
+    } catch (e) {
+      this.snackbarText =
+        "You've failed to level up the Crypto Zombie #" + this.zombieId
+      console.log('feed', e)
+    }
+    this.levelLoading = false
   }
 
   get isReady() {
@@ -170,8 +337,10 @@ export default class Home extends Vue {
       (zombie) => String(zombie.id) === this.$route.params.id
     )
     if (zombieIndex !== -1) {
+      this.isOwner = true
       this.zombie = this.zombies[zombieIndex]
     } else {
+      this.isOwner = false
       try {
         this.zombie = await this.cryptoZombieContract.zombies(
           this.$route.params.id

@@ -2,21 +2,17 @@
   <div>
     <v-toolbar>
       <v-toolbar-title>
-        <nuxt-link
-          class="white--text"
-          to="/"
-          tag="span"
-          style="cursor: pointer"
-        >
+        <nuxt-link class="blue--text" to="/" tag="span" style="cursor: pointer">
           {{ appTitle }}
         </nuxt-link>
       </v-toolbar-title>
+
+      <v-toolbar-items v-if="isConnected" class="hidden-sm-and-down ml-3">
+        <v-btn to="/zombies" text>My Zombies</v-btn>
+        <v-btn class="mr-2" to="/create" text>Create a Random Zombie</v-btn>
+      </v-toolbar-items>
       <v-spacer></v-spacer>
       <div class="hidden-sm-and-down">
-        <v-btn class="mr-2" color="primary" to="/create"
-          >Create a Random Zombie</v-btn
-        >
-
         <v-btn v-if="!isConnected" color="primary" @click="connect"
           >Connect</v-btn
         >
@@ -36,16 +32,28 @@
           ></v-app-bar-nav-icon>
         </template>
         <v-list>
-          <v-list-item>
+          <v-list-item v-if="isConnected">
             <v-list-item-title>
-              <v-btn class="mr-2" color="primary" to="/create" outlined block
+              <v-btn color="primary" to="/create" outlined block
                 >Create a Random Zombie</v-btn
               >
             </v-list-item-title>
           </v-list-item>
           <v-list-item v-if="isConnected">
             <v-list-item-title>
-              <v-btn outlined block class="mr-2">{{ address }}</v-btn>
+              <v-btn
+                v-if="isConnected"
+                to="/zombies"
+                color="success"
+                outlined
+                block
+                >My Zombies</v-btn
+              >
+            </v-list-item-title>
+          </v-list-item>
+          <v-list-item v-if="isConnected">
+            <v-list-item-title>
+              <v-btn outlined block class="my-2">{{ address }}</v-btn>
             </v-list-item-title>
           </v-list-item>
           <v-list-item>
@@ -104,7 +112,7 @@ export default class Header extends Vue {
       const signer = provider.getSigner()
       this.setConnectedAddress(await signer.getAddress())
       this.setConnected(true)
-      //   this.$nuxt.$emit('fetchBalance')
+      this.$nuxt.$emit('loadZombies')
     } catch (e) {
       console.error('Header', e)
     }
