@@ -10,6 +10,12 @@ import { Zombie } from '~/interfaces/zombie'
 
 export default class Wallet extends VuexModule {
     public zombies: Array<Zombie> = []
+    public levelUpFee: number = 0.001 * 10 ** 18
+
+    @Mutation
+    public setLevelUpFee(fee: number) {
+        this.levelUpFee = fee
+    }
 
     @Mutation
     public setZombies(zombies: Array<Zombie>) {

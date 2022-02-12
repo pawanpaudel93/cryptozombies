@@ -180,7 +180,7 @@ export default class ZombieCharacter extends Vue {
   zombieLoaded() {
     window.setTimeout(() => {
       this.isZombieLoaded = true
-    }, 2050)
+    }, 1000)
   }
 
   getColor(deg: number) {
@@ -283,7 +283,7 @@ export default class ZombieCharacter extends Vue {
 
 .zombie-loading-parts {
   position: absolute;
-  top: 200px;
+  top: 180px;
   left: 100px;
 
   .head {

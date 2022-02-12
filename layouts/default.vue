@@ -22,6 +22,7 @@ import Header from '@/components/Header.vue'
 import NotConnected from '@/components/NotConnected.vue'
 import InvalidChain from '@/components/InvalidChain.vue'
 import { Zombie } from '~/interfaces/zombie'
+import { BigNumber } from '@ethersproject/bignumber'
 declare let window: any
 
 const wallet = namespace('wallet')
@@ -47,6 +48,9 @@ export default class Default extends Vue {
   @wallet.State
   public connectedAddress!: string
 
+  @zombie.Mutation
+  public setLevelUpFee!: (fee: number) => void
+
   @wallet.Mutation
   public setConnected!: (isConnected: boolean) => void
 
@@ -70,6 +74,15 @@ export default class Default extends Vue {
     } catch (e) {
       this.setZombies([])
     }
+  }
+
+  async fetchLevelUpFee() {
+    try {
+      const signer = await provider.getSigner()
+      const cryptoZombieContract = getCryptoZombiesContract(signer)
+      const fee = await cryptoZombieContract.levelUpFee()
+      this.setLevelUpFee(parseInt(fee))
+    } catch (e) {}
   }
 
   startListeners() {
@@ -125,6 +138,7 @@ export default class Default extends Vue {
   mounted() {
     this.startListeners()
     this.autoConnect()
+    this.fetchLevelUpFee()
 
     this.$nuxt.$on('loadZombies', () => {
       this.loadZombies()

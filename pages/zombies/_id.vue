@@ -1,8 +1,8 @@
 <template>
   <v-container fluid>
     <div>
-      <v-btn text to="/zombies"
-        ><v-icon large>mdi-arrow-left-bold</v-icon></v-btn
+      <v-btn text @click="$router.go(-1)">
+        <v-icon large>mdi-arrow-left-bold</v-icon></v-btn
       >
     </div>
     <div class="text-center">
@@ -204,6 +204,9 @@ export default class Home extends Vue {
   @zombie.State
   zombies!: Array<Zombie>
 
+  @zombie.State
+  levelUpFee!: number
+
   @zombie.Mutation
   updateZombie!: (update: { id: BigNumber; data: object }) => void
 
@@ -307,7 +310,7 @@ export default class Home extends Vue {
       const levelUpTx = await this.cryptoZombieContract.levelUp(
         this.zombie.id,
         {
-          value: utils.parseEther('0.001'),
+          value: this.levelUpFee,
         }
       )
       await levelUpTx.wait()
