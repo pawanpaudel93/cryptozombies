@@ -38,7 +38,12 @@ export default {
   ],
 
   // Modules: https://go.nuxtjs.dev/config-modules
-  modules: [],
+  modules: [
+    ["vue-toastification/nuxt", {
+      timeout: 3000,
+      draggable: false
+    }]
+  ],
 
   // Vuetify module configuration: https://go.nuxtjs.dev/config-vuetify
   vuetify: {

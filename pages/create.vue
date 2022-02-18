@@ -1,6 +1,6 @@
 <template>
-  <v-container fluid class="mt-5">
-    <v-card>
+  <v-container class="mt-5">
+    <v-card elevation="12">
       <v-card-title> Create a Random Zombie </v-card-title>
       <v-card-text v-if="zombiesCount == 0">
         <v-form ref="form" @submit.prevent="create">
@@ -22,19 +22,13 @@
       </v-card-text>
       <v-card-text v-else>
         <v-alert type="warning" outlined dense>
-          You already have a zombie.
+          You have already created a zombie. If you want to own more zombies,
+          you can feed on CryptoKitties to create new mixed zombies, attack
+          other zombies to create new zombies by winning or buying zombies with
+          others.
         </v-alert>
       </v-card-text>
     </v-card>
-    <v-snackbar v-model="snackbar" timeout="5000" color="success" outlined>
-      {{ snackbarText }}
-
-      <template #action="{ attrs }">
-        <v-btn color="blue" text v-bind="attrs" @click="snackbar = false">
-          Close
-        </v-btn>
-      </template>
-    </v-snackbar>
   </v-container>
 </template>
 
@@ -51,8 +45,6 @@ export default class Home extends Vue {
   cryptoZombieContract: Contract = getCryptoZombiesContract()
   name: string = ''
   loading: boolean = false
-  snackbar: boolean = false
-  snackbarText: string = ''
   zombiesCount: number = 0
 
   @Ref('form') readonly form!: HTMLFormElement
@@ -66,7 +58,7 @@ export default class Home extends Vue {
     try {
       const tx = await this.cryptoZombieContract.createRandomZombie(this.name)
       const receipt = await tx.wait()
-      this.snackbarText = `Congratulations. Zombie ${this.name} is created.`
+      this.$toast.success(`Congratulations. Zombie ${this.name} is created.`)
       const events = receipt.events
       if (events.length > 0) {
         const event = events[0]
@@ -85,10 +77,9 @@ export default class Home extends Vue {
       this.$router.push('/zombies')
     } catch (e) {
       console.error('Create', e)
-      this.snackbarText = `Failed to create zombie ${this.name}.`
+      this.$toast.error(`Failed to create zombie ${this.name}.`)
     }
     this.loading = false
-    this.snackbar = true
   }
 
   async mounted() {

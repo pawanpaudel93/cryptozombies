@@ -284,7 +284,7 @@ export default class ZombieCharacter extends Vue {
 .zombie-loading-parts {
   position: absolute;
   top: 180px;
-  left: 100px;
+  left: 80px;
 
   .head {
     width: 28vh;

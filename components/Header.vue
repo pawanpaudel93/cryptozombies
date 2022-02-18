@@ -3,13 +3,14 @@
     <v-toolbar>
       <v-toolbar-title>
         <nuxt-link class="blue--text" to="/" tag="span" style="cursor: pointer">
-          {{ appTitle }}
+          <b>{{ appTitle }}</b>
         </nuxt-link>
       </v-toolbar-title>
 
       <v-toolbar-items v-if="isConnected" class="hidden-sm-and-down ml-3">
         <v-btn to="/zombies" text>My Zombies</v-btn>
-        <v-btn class="mr-2" to="/create" text>Create a Random Zombie</v-btn>
+        <v-btn to="/create" text>Create a Random Zombie</v-btn>
+        <v-btn v-if="isAdmin" to="/admin" text>Admin</v-btn>
       </v-toolbar-items>
       <v-spacer></v-spacer>
       <div class="hidden-sm-and-down">
@@ -51,6 +52,11 @@
               >
             </v-list-item-title>
           </v-list-item>
+          <v-list-item v-if="isConnected && isAdmin">
+            <v-list-item-title>
+              <v-btn to="/admin" outlined block>Admin</v-btn>
+            </v-list-item-title>
+          </v-list-item>
           <v-list-item v-if="isConnected">
             <v-list-item-title>
               <v-btn outlined block class="my-2">{{ address }}</v-btn>
@@ -87,6 +93,7 @@ import { Vue, Component, namespace } from 'nuxt-property-decorator'
 import { provider } from '~/plugins/provider'
 
 const wallet = namespace('wallet')
+const zombie = namespace('zombie')
 
 @Component
 export default class Header extends Vue {
@@ -99,6 +106,9 @@ export default class Header extends Vue {
 
   @wallet.State
   public connectedAddress!: string
+
+  @zombie.State
+  contractAdmin!: string
 
   @wallet.Mutation
   public setConnected!: (isConnected: boolean) => void
@@ -127,6 +137,10 @@ export default class Header extends Vue {
       return address
     }
     return ''
+  }
+
+  get isAdmin() {
+    return this.contractAdmin === this.connectedAddress
   }
 
   disconnect(): void {

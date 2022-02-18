@@ -22,7 +22,6 @@ import Header from '@/components/Header.vue'
 import NotConnected from '@/components/NotConnected.vue'
 import InvalidChain from '@/components/InvalidChain.vue'
 import { Zombie } from '~/interfaces/zombie'
-import { BigNumber } from '@ethersproject/bignumber'
 declare let window: any
 
 const wallet = namespace('wallet')
@@ -63,6 +62,9 @@ export default class Default extends Vue {
   @zombie.Mutation
   setZombies!: (zombies: Array<Zombie>) => void
 
+  @zombie.Mutation
+  setContractAdmin!: (admin: string) => void
+
   async loadZombies() {
     try {
       const signer = await provider.getSigner()
@@ -83,6 +85,17 @@ export default class Default extends Vue {
       const fee = await cryptoZombieContract.levelUpFee()
       this.setLevelUpFee(parseInt(fee))
     } catch (e) {}
+  }
+
+  async fetchContractOwner() {
+    try {
+      const signer = provider.getSigner()
+      const cryptoZombieContract = getCryptoZombiesContract(signer)
+      const owner = await cryptoZombieContract.owner()
+      this.setContractAdmin(owner)
+    } catch (e) {
+      console.log(e)
+    }
   }
 
   startListeners() {
@@ -139,6 +152,7 @@ export default class Default extends Vue {
     this.startListeners()
     this.autoConnect()
     this.fetchLevelUpFee()
+    this.fetchContractOwner()
 
     this.$nuxt.$on('loadZombies', () => {
       this.loadZombies()

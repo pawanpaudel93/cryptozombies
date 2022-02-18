@@ -1,7 +1,7 @@
 <template>
   <v-container fluid>
     <div class="text-center">
-      <h3 class="white--text">My Zombies</h3>
+      <h3 class="white--text">My Crypto Zombies</h3>
     </div>
     <v-row>
       <v-col
@@ -12,7 +12,7 @@
         sm="6"
       >
         <zombie-character :zombie="zombie"></zombie-character>
-        <v-card>
+        <v-card elevation="12">
           <div class="text-center">
             <nuxt-link :to="'/zombies/' + zombie.id">
               #{{ zombie.id }} {{ zombie.name }}</nuxt-link

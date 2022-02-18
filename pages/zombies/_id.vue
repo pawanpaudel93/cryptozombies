@@ -136,21 +136,11 @@
         </v-row>
       </v-card-text>
     </v-card>
-    <v-snackbar v-model="snackbar" timeout="5000" color="success" outlined>
-      {{ snackbarText }}
-
-      <template #action="{ attrs }">
-        <v-btn color="blue" text v-bind="attrs" @click="snackbar = false">
-          Close
-        </v-btn>
-      </template>
-    </v-snackbar>
   </v-container>
 </template>
 
 <script lang="ts">
-import { BigNumber } from '@ethersproject/bignumber'
-import { Contract, utils } from 'ethers'
+import { Contract, BigNumber } from 'ethers'
 import { Vue, Component, Ref, namespace } from 'nuxt-property-decorator'
 import { provider, getCryptoZombiesContract } from '~/plugins/provider'
 import ZombieCharacter from '~/components/ZombieCharacter.vue'
@@ -174,9 +164,6 @@ export default class Home extends Vue {
   zombieId: number = 0
   name: string = ''
   dna: string = ''
-
-  snackbar: boolean = false
-  snackbarText: string = ''
   isOwner: boolean = false
   cryptoZombieContract: Contract = getCryptoZombiesContract()
   zombie: Zombie = {
@@ -220,11 +207,13 @@ export default class Home extends Vue {
       )
       await feedTx.wait()
       this.feedForm.reset()
-      this.snackbarText =
+      this.$toast.success(
         "You've successfully fed on the Crypto Kitty #" + this.kittyId
+      )
     } catch (e) {
-      this.snackbarText =
+      this.$toast.error(
         "You've failed to feed on the Crypto Kitty #" + this.kittyId
+      )
       console.log('feed', e)
     }
     this.feedLoading = false
@@ -240,11 +229,13 @@ export default class Home extends Vue {
       )
       await attackTx.wait()
       this.attackForm.reset()
-      this.snackbarText =
+      this.$toast.success(
         "You've successfully attacked the Crypto Zombie #" + this.zombieId
+      )
     } catch (e) {
-      this.snackbarText =
+      this.$toast.error(
         "You've failed to attack the Crypto Zombie #" + this.zombieId
+      )
       console.log('feed', e)
     }
     this.attackLoading = false
@@ -265,13 +256,15 @@ export default class Home extends Vue {
       })
       this.zombie.name = this.name
       this.nameForm.reset()
-      this.snackbarText =
+      this.$toast.success(
         "You've successfully changed the name of the Crypto Zombie #" +
-        this.zombie.id
+          this.zombie.id
+      )
     } catch (e) {
-      this.snackbarText =
+      this.$toast.error(
         "You've failed to change the name of the Crypto Zombie #" +
-        this.zombie.id
+          this.zombie.id
+      )
       console.log('feed', e)
     }
     this.nameLoading = false
@@ -292,13 +285,15 @@ export default class Home extends Vue {
       })
       this.zombie.dna = BigNumber.from(this.dna)
       this.dnaForm.reset()
-      this.snackbarText =
+      this.$toast.success(
         "You've successfully changed the DNA of the Crypto Zombie #" +
-        this.zombie.id
+          this.zombie.id
+      )
     } catch (e) {
-      this.snackbarText =
+      this.$toast.error(
         "You've failed to change the DNA of the Crypto Zombie #" +
-        this.zombie.id
+          this.zombie.id
+      )
       console.log('feed', e)
     }
     this.dnaLoading = false
@@ -319,11 +314,13 @@ export default class Home extends Vue {
         data: { level: this.zombie.level + 1 },
       })
       this.zombie.level++
-      this.snackbarText =
+      this.$toast.success(
         "You've successfully leveled up the Crypto Zombie #" + this.zombieId
+      )
     } catch (e) {
-      this.snackbarText =
+      this.$toast.error(
         "You've failed to level up the Crypto Zombie #" + this.zombieId
+      )
       console.log('feed', e)
     }
     this.levelLoading = false

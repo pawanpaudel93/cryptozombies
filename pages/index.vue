@@ -3,7 +3,7 @@
     <v-row>
       <v-col v-for="(zombie, index) in zombies" :key="index" md="3" sm="6">
         <zombie-character :zombie="zombie"></zombie-character>
-        <v-card>
+        <v-card elevation="12">
           <div class="text-center">
             <nuxt-link :to="'/zombies/' + zombie.id">
               #{{ zombie.id }} {{ zombie.name }}</nuxt-link

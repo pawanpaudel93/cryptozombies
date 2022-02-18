@@ -9,8 +9,21 @@ import { Zombie } from '~/interfaces/zombie'
 })
 
 export default class Wallet extends VuexModule {
+    public contractAdmin: string = ''
+    public isAdmin: boolean = false
     public zombies: Array<Zombie> = []
     public levelUpFee: number = 0.001 * 10 ** 18
+
+
+    @Mutation
+    public setAdmin(isAdmin: boolean) {
+        this.isAdmin = isAdmin
+    }
+
+    @Mutation
+    public setContractAdmin(admin: string) {
+        this.contractAdmin = admin
+    }
 
     @Mutation
     public setLevelUpFee(fee: number) {
