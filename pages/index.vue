@@ -1,6 +1,6 @@
 <template>
   <div>
-    <v-row>
+    <v-row v-if="zombies.length > 0">
       <v-col v-for="(zombie, index) in zombies" :key="index" md="3" sm="6">
         <zombie-character :zombie="zombie"></zombie-character>
         <v-card elevation="12">
@@ -12,6 +12,15 @@
         </v-card>
       </v-col>
     </v-row>
+    <v-alert
+      v-else
+      color="primary"
+      icon="mdi-alert-circle-outline"
+      class="mt-6"
+      outlined
+    >
+      <span class="white--text">No CryptoZombies found.</span>
+    </v-alert>
     <infinite-loading
       v-if="zombies.length > 0"
       spinner="bubbles"

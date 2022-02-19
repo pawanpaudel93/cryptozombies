@@ -55,4 +55,12 @@ export default class Wallet extends VuexModule {
             Vue.set(this.zombies, zombieIndex, { ...this.zombies[zombieIndex], ...update.data })
         }
     }
+
+    @Mutation
+    removeZombie(id: BigNumber) {
+        const zombieIndex = this.zombies.findIndex(zombie => zombie.id === id)
+        if (zombieIndex !== 1) {
+            this.zombies.splice(zombieIndex, 1)
+        }
+    }
 }

@@ -1,20 +1,70 @@
 <template>
   <v-container fluid>
-    <div>
-      <v-btn text @click="$router.go(-1)">
-        <v-icon large>mdi-arrow-left-bold</v-icon></v-btn
-      >
-    </div>
+    <v-btn text @click="$router.go(-1)">
+      <v-icon large>mdi-arrow-left-bold</v-icon>
+    </v-btn>
     <div class="text-center">
       <h3>#{{ zombie.id }} {{ zombie.name }}</h3>
     </div>
-    <v-row v-if="isOwner" class="mb-5">
+    <v-row class="mb-5">
       <v-col cols="12" md="4">
         <zombie-character :zombie="zombie"></zombie-character>
       </v-col>
       <v-col cols="12" md="8">
-        <v-row class="mt-12">
-          <v-col md="6" cols="12" class="text-center px-12 py-6">
+        <v-card
+          outlined
+          shaped
+          elevation="24"
+          :style="{
+            marginTop: $vuetify.breakpoint.mdAndUp ? '130px' : '',
+          }"
+          align="center"
+        >
+          <v-card-text>
+            <v-row>
+              <v-col cols="6" class="font-weight-medium">ID: </v-col>
+              <v-col cols="6" class="font-weight-bold">{{ zombie.id }}</v-col>
+              <v-col cols="6" class="font-weight-medium">Name: </v-col>
+              <v-col cols="6" class="font-weight-bold">{{ zombie.name }}</v-col>
+              <v-col cols="6" class="font-weight-medium">DNA: </v-col>
+              <v-col cols="6" class="font-weight-bold">{{ zombie.dna }}</v-col>
+              <v-col cols="6" class="font-weight-medium">Level: </v-col>
+              <v-col cols="6" class="font-weight-bold">{{
+                zombie.level
+              }}</v-col>
+              <v-col cols="6" class="font-weight-medium">Win Count: </v-col>
+              <v-col cols="6" class="font-weight-bold">{{
+                zombie.winCount
+              }}</v-col>
+              <v-col cols="6" class="font-weight-medium">Loss Count: </v-col>
+              <v-col cols="6" class="font-weight-bold">{{
+                zombie.lossCount
+              }}</v-col>
+              <v-col cols="6">Ready Time: </v-col>
+              <v-col cols="6" class="font-weight-bold">{{
+                new Date(zombie.readyTime * 1000)
+              }}</v-col>
+            </v-row>
+          </v-card-text>
+        </v-card>
+      </v-col>
+    </v-row>
+    <v-card v-if="isOwner">
+      <v-card-title class="justify-center"> Zombie Settings </v-card-title>
+      <v-card-text>
+        <v-row>
+          <v-col md="4" cols="12" class="text-center px-12 py-6">
+            <h4>Level up your Zombie Level</h4>
+            <v-btn
+              class="mt-3"
+              color="blue"
+              :loading="levelLoading"
+              :disabled="levelLoading"
+              @click="levelUp"
+              >Level Up</v-btn
+            >
+          </v-col>
+          <v-col md="4" cols="12" class="text-center px-12 py-6">
             <v-form ref="feed" @submit.prevent="feed">
               <h4>Feed on Crypto Kitties</h4>
               <v-text-field
@@ -34,7 +84,7 @@
             </v-form>
           </v-col>
 
-          <v-col md="6" cols="12" class="text-center px-12 py-6">
+          <v-col md="4" cols="12" class="text-center px-12 py-6">
             <v-form ref="attack" @submit.prevent="attack">
               <h4>Attack another Crypto Zombie</h4>
               <v-text-field
@@ -98,42 +148,36 @@
               >
             </v-form>
           </v-col>
-          <v-col md="6" cols="12" class="text-center px-12 py-6">
-            <h4>Level up your Zombie Level</h4>
-            <v-btn
-              color="blue"
-              :loading="levelLoading"
-              :disabled="levelLoading"
-              @click="levelUp"
-              >Level Up</v-btn
+        </v-row>
+        <v-container :fluid="!$vuetify.breakpoint.mdAndUp">
+          <div class="text-center mt-3">
+            <v-alert color="primary" dense outlined>
+              <span class="white--text">Zombie Transfer</span>
+            </v-alert>
+          </div>
+          <v-form ref="transfer">
+            <v-text-field
+              v-model="transferAddress"
+              label="Transfer Address"
+              :rules="[
+                (v) => !!v || 'Transfer Address is required',
+                (v) =>
+                  /^0x[0-9a-fA-F]{40}$/.test(v) ||
+                  'Transfer Address must be a valid Ethereum address',
+              ]"
             >
-          </v-col>
-        </v-row>
-      </v-col>
-    </v-row>
-    <zombie-character v-else :zombie="zombie"></zombie-character>
-    <v-card outlined shaped elevation="24" class="mt-3" align="center">
-      <v-card-text>
-        <v-row>
-          <v-col cols="6" class="font-weight-medium">ID: </v-col>
-          <v-col cols="6" class="font-weight-bold">{{ zombie.id }}</v-col>
-          <v-col cols="6" class="font-weight-medium">Name: </v-col>
-          <v-col cols="6" class="font-weight-bold">{{ zombie.name }}</v-col>
-          <v-col cols="6" class="font-weight-medium">DNA: </v-col>
-          <v-col cols="6" class="font-weight-bold">{{ zombie.dna }}</v-col>
-          <v-col cols="6" class="font-weight-medium">Level: </v-col>
-          <v-col cols="6" class="font-weight-bold">{{ zombie.level }}</v-col>
-          <v-col cols="6" class="font-weight-medium">Win Count: </v-col>
-          <v-col cols="6" class="font-weight-bold">{{ zombie.winCount }}</v-col>
-          <v-col cols="6" class="font-weight-medium">Loss Count: </v-col>
-          <v-col cols="6" class="font-weight-bold">{{
-            zombie.lossCount
-          }}</v-col>
-          <v-col cols="6">Ready Time: </v-col>
-          <v-col cols="6" class="font-weight-bold">{{
-            new Date(zombie.readyTime * 1000)
-          }}</v-col>
-        </v-row>
+            </v-text-field>
+            <div class="text-center">
+              <v-btn
+                color="blue"
+                :loading="transferLoading"
+                :disabled="transferLoading"
+                @click="transfer"
+                >Transfer</v-btn
+              >
+            </div>
+          </v-form>
+        </v-container>
       </v-card-text>
     </v-card>
   </v-container>
@@ -147,6 +191,7 @@ import ZombieCharacter from '~/components/ZombieCharacter.vue'
 import { Zombie } from '~/interfaces/zombie'
 
 const zombie = namespace('zombie')
+const wallet = namespace('wallet')
 
 @Component({
   components: {
@@ -159,12 +204,14 @@ export default class Home extends Vue {
   nameLoading: boolean = false
   dnaLoading: boolean = false
   levelLoading: boolean = false
+  transferLoading: boolean = false
 
   kittyId: number = 0
   zombieId: number = 0
   name: string = ''
   dna: string = ''
   isOwner: boolean = false
+  transferAddress: string = ''
   cryptoZombieContract: Contract = getCryptoZombiesContract()
   zombie: Zombie = {
     id: BigNumber.from(-1),
@@ -188,6 +235,12 @@ export default class Home extends Vue {
   @Ref('dna')
   dnaForm!: HTMLFormElement
 
+  @Ref('transfer')
+  transferForm!: HTMLFormElement
+
+  @wallet.State
+  connectedAddress!: string
+
   @zombie.State
   zombies!: Array<Zombie>
 
@@ -196,6 +249,9 @@ export default class Home extends Vue {
 
   @zombie.Mutation
   updateZombie!: (update: { id: BigNumber; data: object }) => void
+
+  @zombie.Mutation
+  removeZombie!: (id: BigNumber) => void
 
   async feed() {
     if (!this.feedForm.validate()) return
@@ -206,10 +262,10 @@ export default class Home extends Vue {
         this.kittyId
       )
       await feedTx.wait()
-      this.feedForm.reset()
       this.$toast.success(
         "You've successfully fed on the Crypto Kitty #" + this.kittyId
       )
+      this.feedForm.reset()
     } catch (e) {
       this.$toast.error(
         "You've failed to feed on the Crypto Kitty #" + this.kittyId
@@ -228,10 +284,10 @@ export default class Home extends Vue {
         this.zombieId
       )
       await attackTx.wait()
-      this.attackForm.reset()
       this.$toast.success(
         "You've successfully attacked the Crypto Zombie #" + this.zombieId
       )
+      this.attackForm.reset()
     } catch (e) {
       this.$toast.error(
         "You've failed to attack the Crypto Zombie #" + this.zombieId
@@ -324,6 +380,32 @@ export default class Home extends Vue {
       console.log('feed', e)
     }
     this.levelLoading = false
+  }
+
+  async transfer() {
+    if (!this.transferForm.validate()) return
+    try {
+      this.transferLoading = true
+      const transferTx = await this.cryptoZombieContract.transferFrom(
+        this.connectedAddress,
+        this.transferAddress,
+        this.zombie.id
+      )
+      await transferTx.wait()
+      this.transferForm.reset()
+      this.isOwner = false
+      this.removeZombie(this.zombie.id)
+      this.$toast.success(
+        "You've successfully transferred the Crypto Zombie #" + this.zombieId
+      )
+      this.transferForm.reset()
+    } catch (e) {
+      this.$toast.error(
+        "You've failed to transfer the Crypto Zombie #" + this.zombieId
+      )
+      console.log('feed', e)
+    }
+    this.transferLoading = false
   }
 
   get isReady() {

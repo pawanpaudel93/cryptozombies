@@ -1,5 +1,5 @@
 import { ethers, providers, Contract } from "ethers";
-import CryptoZombiesABI from "@/CryptoZombiesABI.json";
+import CryptoZombiesABI from "@/assets/json/CryptoZombiesABI.json";
 
 declare let window: any;
 

@@ -2,7 +2,14 @@
   <v-app>
     <Header />
     <v-main>
-      <v-container v-if="isChainSupported && isConnected" fluid class="px-10">
+      <v-container v-if="$route.name === 'index'" fluid class="px-10">
+        <Nuxt />
+      </v-container>
+      <v-container
+        v-else-if="isChainSupported && isConnected"
+        fluid
+        class="px-10"
+      >
         <Nuxt />
       </v-container>
       <v-container v-else-if="isChainSupported && !isConnected">
