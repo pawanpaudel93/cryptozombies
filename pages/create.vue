@@ -61,18 +61,16 @@ export default class Home extends Vue {
       this.$toast.success(`Congratulations. Zombie ${this.name} is created.`)
       const events = receipt.events
       if (events.length > 0) {
-        const event = events[0]
-        if (event.event === 'NewZombie') {
-          this.addZombie({
-            id: event.args.zombieId,
-            name: event.args.name,
-            dna: event.args.dna,
-            level: 0,
-            winCount: 0,
-            lossCount: 0,
-            readyTime: Date.now() / 1000 + 86400,
-          })
-        }
+        const event = events.find((e: any) => e.event === 'NewZombie')
+        this.addZombie({
+          id: event.args.zombieId,
+          name: event.args.name,
+          dna: event.args.dna,
+          level: 0,
+          winCount: 0,
+          lossCount: 0,
+          readyTime: parseInt((Date.now() / 1000 + 86400).toString()),
+        })
       }
       this.$router.push('/zombies')
     } catch (e) {
@@ -88,7 +86,7 @@ export default class Home extends Vue {
       const address = await signer.getAddress()
       this.cryptoZombieContract = getCryptoZombiesContract(signer)
       this.zombiesCount = parseInt(
-        await this.cryptoZombieContract.ownerZombieCount(address)
+        await this.cryptoZombieContract.balanceOf(address)
       )
     } catch (e) {
       console.error('Create Mounted', e)

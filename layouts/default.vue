@@ -24,6 +24,7 @@
 
 <script lang="ts">
 import { Vue, Component, namespace } from 'nuxt-property-decorator'
+import { Contract } from 'ethers'
 import { provider, getCryptoZombiesContract } from '~/plugins/provider'
 import Header from '@/components/Header.vue'
 import NotConnected from '@/components/NotConnected.vue'
@@ -42,6 +43,8 @@ const zombie = namespace('zombie')
   },
 })
 export default class Default extends Vue {
+  cryptoZombieContract: Contract = getCryptoZombiesContract()
+
   @wallet.State
   public isConnected!: boolean
 
@@ -53,6 +56,9 @@ export default class Default extends Vue {
 
   @wallet.State
   public connectedAddress!: string
+
+  @wallet.State
+  zombies!: Zombie[]
 
   @zombie.Mutation
   public setLevelUpFee!: (fee: number) => void
@@ -74,9 +80,7 @@ export default class Default extends Vue {
 
   async loadZombies() {
     try {
-      const signer = await provider.getSigner()
-      const cryptoZombieContract = getCryptoZombiesContract(signer)
-      const zombies = await cryptoZombieContract.getZombiesByOwner(
+      const zombies = await this.cryptoZombieContract.getZombiesByOwner(
         this.connectedAddress
       )
       this.setZombies(zombies)
@@ -87,25 +91,21 @@ export default class Default extends Vue {
 
   async fetchLevelUpFee() {
     try {
-      const signer = await provider.getSigner()
-      const cryptoZombieContract = getCryptoZombiesContract(signer)
-      const fee = await cryptoZombieContract.levelUpFee()
+      const fee = await this.cryptoZombieContract.levelUpFee()
       this.setLevelUpFee(parseInt(fee))
     } catch (e) {}
   }
 
   async fetchContractOwner() {
     try {
-      const signer = provider.getSigner()
-      const cryptoZombieContract = getCryptoZombiesContract(signer)
-      const owner = await cryptoZombieContract.owner()
+      const owner = await this.cryptoZombieContract.owner()
       this.setContractAdmin(owner)
     } catch (e) {
       console.log(e)
     }
   }
 
-  startListeners() {
+  async startListeners() {
     window.ethereum.on('accountsChanged', (accounts: string[]) => {
       if (accounts.length > 0) {
         this.setConnectedAddress(accounts[0])
@@ -134,6 +134,21 @@ export default class Default extends Vue {
       }
       this.loadZombies()
     })
+
+    const startBlockNumber = await provider.getBlockNumber()
+    this.cryptoZombieContract.on(
+      'Attacked',
+      (attackerId, targetId, target, win, event) => {
+        if (event.blockNumber <= startBlockNumber) return
+        if (target === this.connectedAddress) {
+          this.$toast.info(
+            `You have been attacked by #${attackerId} and you ${
+              win ? 'won' : 'lose'
+            } the attack!`
+          )
+        }
+      }
+    )
   }
 
   async autoConnect() {
@@ -141,6 +156,7 @@ export default class Default extends Vue {
       const signer = this.connectedAddress
         ? await provider.getSigner(this.connectedAddress)
         : await provider.getSigner()
+      this.cryptoZombieContract = getCryptoZombiesContract(signer)
       const { chainId } = await provider.getNetwork()
       if (chainId && signer && this.supportedChainIds.includes(chainId)) {
         this.setConnectedAddress(await signer.getAddress())

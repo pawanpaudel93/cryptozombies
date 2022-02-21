@@ -49,7 +49,7 @@ export default class Wallet extends VuexModule {
     }
 
     @Mutation
-    updateZombie(update: { id: BigNumber, data: { level: number } }) {
+    updateZombie(update: { id: BigNumber, data: object }) {
         const zombieIndex = this.zombies.findIndex(zombie => zombie.id === update.id)
         if (zombieIndex !== 1) {
             Vue.set(this.zombies, zombieIndex, { ...this.zombies[zombieIndex], ...update.data })
