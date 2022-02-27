@@ -2,7 +2,7 @@
   <v-container class="mt-5">
     <v-card elevation="12">
       <v-card-title> Create a Random Zombie </v-card-title>
-      <v-card-text v-if="zombiesCount == 0">
+      <v-card-text v-if="zombies.length == 0">
         <v-form ref="form" @submit.prevent="create">
           <v-text-field
             v-model="name"
@@ -49,6 +49,9 @@ export default class Home extends Vue {
 
   @Ref('form') readonly form!: HTMLFormElement
 
+  @zombie.State
+  zombies!: Zombie[]
+
   @zombie.Mutation
   public addZombie!: (zombie: Zombie) => void
 
@@ -83,11 +86,7 @@ export default class Home extends Vue {
   async mounted() {
     try {
       const signer = await provider.getSigner()
-      const address = await signer.getAddress()
       this.cryptoZombieContract = getCryptoZombiesContract(signer)
-      this.zombiesCount = parseInt(
-        await this.cryptoZombieContract.balanceOf(address)
-      )
     } catch (e) {
       console.error('Create Mounted', e)
     }

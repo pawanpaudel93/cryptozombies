@@ -184,7 +184,7 @@
 </template>
 
 <script lang="ts">
-import { Contract, BigNumber } from 'ethers'
+import { Contract } from 'ethers'
 import { Vue, Component, Ref, namespace } from 'nuxt-property-decorator'
 import { provider, getCryptoZombiesContract } from '~/plugins/provider'
 import ZombieCharacter from '~/components/ZombieCharacter.vue'
