@@ -68,6 +68,7 @@ export default {
   build: {},
 
   env: {
-    CONTRACT_ADDRESS: process.env.CONTRACT_ADDRESS
+    CONTRACT_ADDRESS: process.env.CONTRACT_ADDRESS,
+    ALCHEMY_API_KEY: process.env.ALCHEMY_API_KEY,
   }
 }

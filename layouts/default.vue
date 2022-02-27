@@ -43,7 +43,7 @@ const zombie = namespace('zombie')
   },
 })
 export default class Default extends Vue {
-  cryptoZombieContract: Contract = getCryptoZombiesContract()
+  cryptoZombieContract!: Contract
 
   @wallet.State
   public isConnected!: boolean
@@ -98,7 +98,7 @@ export default class Default extends Vue {
 
   async fetchContractOwner() {
     try {
-      const owner = await this.cryptoZombieContract.owner()
+      const owner = await getCryptoZombiesContract(provider).owner()
       this.setContractAdmin(owner)
     } catch (e) {
       console.log(e)
@@ -172,8 +172,8 @@ export default class Default extends Vue {
   }
 
   mounted() {
-    this.startListeners()
     this.autoConnect()
+    this.startListeners()
     this.fetchLevelUpFee()
     this.fetchContractOwner()
 

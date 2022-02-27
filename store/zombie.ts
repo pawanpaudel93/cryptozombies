@@ -1,7 +1,6 @@
 import { Vue } from 'nuxt-property-decorator';
-import { BigNumber } from 'ethers'
 import { Module, VuexModule, Mutation } from 'vuex-module-decorators'
-import { Zombie } from '~/interfaces/zombie'
+import { Zombie, ZombieInput } from '~/interfaces/zombie'
 @Module({
     name: 'zombie',
     stateFactory: true,
@@ -31,11 +30,11 @@ export default class Wallet extends VuexModule {
     }
 
     @Mutation
-    public setZombies(zombies: Array<Zombie>) {
+    public setZombies(zombies: Array<ZombieInput>) {
         this.zombies = zombies.map(zombie => ({
-            id: zombie.id,
+            id: zombie.id.toNumber(),
             name: zombie.name,
-            dna: zombie.dna,
+            dna: zombie.dna.toNumber(),
             level: zombie.level,
             winCount: zombie.winCount,
             lossCount: zombie.lossCount,
@@ -49,7 +48,7 @@ export default class Wallet extends VuexModule {
     }
 
     @Mutation
-    updateZombie(update: { id: BigNumber, data: object }) {
+    updateZombie(update: { id: number, data: object }) {
         const zombieIndex = this.zombies.findIndex(zombie => zombie.id === update.id)
         if (zombieIndex !== 1) {
             Vue.set(this.zombies, zombieIndex, { ...this.zombies[zombieIndex], ...update.data })
@@ -57,7 +56,7 @@ export default class Wallet extends VuexModule {
     }
 
     @Mutation
-    removeZombie(id: BigNumber) {
+    removeZombie(id: number) {
         const zombieIndex = this.zombies.findIndex(zombie => zombie.id === id)
         if (zombieIndex !== 1) {
             this.zombies.splice(zombieIndex, 1)

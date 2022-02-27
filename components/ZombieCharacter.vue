@@ -188,8 +188,8 @@ export default class ZombieCharacter extends Vue {
   }
 
   get currentDna(): string {
-    let dnaStr = String(this.zombie.dna)
-    while (dnaStr.length < 16) dnaStr = '0' + dnaStr
+    let dnaStr = this.zombie.dna.toString()
+    dnaStr = '0'.repeat(16 - dnaStr.length) + dnaStr
     return dnaStr
   }
 

@@ -42,7 +42,7 @@ const zombie = namespace('zombie')
 
 @Component
 export default class Home extends Vue {
-  cryptoZombieContract: Contract = getCryptoZombiesContract()
+  cryptoZombieContract!: Contract
   name: string = ''
   loading: boolean = false
   zombiesCount: number = 0

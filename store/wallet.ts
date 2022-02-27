@@ -8,8 +8,8 @@ import { Module, VuexModule, Mutation } from 'vuex-module-decorators'
 
 export default class Wallet extends VuexModule {
     public isConnected: boolean = false
-    // public supportedChainIds: number[] = [4]
-    public supportedChainIds: number[] = [1337]
+    public supportedChainIds: number[] = [4]
+    // public supportedChainIds: number[] = [1337]
     public isChainSupported: boolean = true
     public connectedAddress: string = ''
 

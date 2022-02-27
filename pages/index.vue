@@ -38,7 +38,7 @@ import { Contract } from 'ethers'
 import { Vue, Component } from 'nuxt-property-decorator'
 import { provider, getCryptoZombiesContract } from '~/plugins/provider'
 import ZombieCharacter from '~/components/ZombieCharacter.vue'
-import { Zombie } from '~/interfaces/zombie'
+import { Zombie, ZombieInput } from '~/interfaces/zombie'
 
 @Component({
   components: {
@@ -46,20 +46,30 @@ import { Zombie } from '~/interfaces/zombie'
   },
 })
 export default class Home extends Vue {
-  cryptoZombieContract: Contract = getCryptoZombiesContract()
+  cryptoZombieContract!: Contract
 
   zombies: Array<Zombie> = []
   startIndex: number = 0
   totalSize: number = 10
 
-  async fetch() {
-    const signer = await provider.getSigner()
-    this.cryptoZombieContract = getCryptoZombiesContract(signer)
+  async created() {
+    this.cryptoZombieContract = getCryptoZombiesContract(provider)
     try {
-      this.zombies = await this.cryptoZombieContract.getZombies(
+      const zombies = await this.cryptoZombieContract.getZombies(
         this.startIndex,
         this.totalSize
       )
+      this.zombies = zombies.map((zombie: ZombieInput) => {
+        return {
+          id: zombie.id.toNumber(),
+          name: zombie.name,
+          dna: zombie.dna.toNumber(),
+          level: zombie.level,
+          winCount: zombie.winCount,
+          lossCount: zombie.lossCount,
+          readyTime: zombie.readyTime,
+        }
+      })
       this.startIndex += this.zombies.length
     } catch (e) {
       console.log(e)
@@ -73,7 +83,19 @@ export default class Home extends Vue {
         this.totalSize
       )
       if (zombies.length > 0) {
-        this.zombies = this.zombies.concat(zombies)
+        this.zombies = this.zombies.concat(
+          zombies.map((zombie: ZombieInput) => {
+            return {
+              id: zombie.id.toNumber(),
+              name: zombie.name,
+              dna: zombie.dna.toNumber(),
+              level: zombie.level,
+              winCount: zombie.winCount,
+              lossCount: zombie.lossCount,
+              readyTime: zombie.readyTime,
+            }
+          })
+        )
         this.startIndex += zombies.length
         $state.loaded()
       } else {

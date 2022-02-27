@@ -212,11 +212,11 @@ export default class Home extends Vue {
   dna: string = ''
   isOwner: boolean = false
   transferAddress: string = ''
-  cryptoZombieContract: Contract = getCryptoZombiesContract()
+  cryptoZombieContract!: Contract
   zombie: Zombie = {
-    id: BigNumber.from(-1),
+    id: -1,
     name: 'Zombie is not available with this ID',
-    dna: BigNumber.from(0),
+    dna: 0,
     level: 0,
     winCount: 0,
     lossCount: 0,
@@ -248,10 +248,10 @@ export default class Home extends Vue {
   levelUpFee!: number
 
   @zombie.Mutation
-  updateZombie!: (update: { id: BigNumber; data: object }) => void
+  updateZombie!: (update: { id: number; data: object }) => void
 
   @zombie.Mutation
-  removeZombie!: (id: BigNumber) => void
+  removeZombie!: (id: number) => void
 
   @zombie.Mutation
   addZombie!: (zombie: Zombie) => void
@@ -375,9 +375,9 @@ export default class Home extends Vue {
       await nameTx.wait()
       this.updateZombie({
         id: this.zombie.id,
-        data: { dna: BigNumber.from(this.dna) },
+        data: { dna: parseInt(this.dna) },
       })
-      this.zombie.dna = BigNumber.from(this.dna)
+      this.zombie.dna = parseInt(this.dna)
       this.dnaForm.reset()
       this.$toast.success(
         "You've successfully changed the DNA of the Crypto Zombie #" +
@@ -460,7 +460,9 @@ export default class Home extends Vue {
       this.isOwner = true
       this.zombie = this.zombies[zombieIndex]
     } else {
-      this.isOwner = false
+      this.isOwner =
+        (await this.cryptoZombieContract.ownerOf(this.$route.params.id)) ===
+        this.connectedAddress
       try {
         this.zombie = await this.cryptoZombieContract.zombies(
           this.$route.params.id
