@@ -11,6 +11,7 @@ export default class Wallet extends VuexModule {
     public contractAdmin: string = ''
     public isAdmin: boolean = false
     public zombies: Array<Zombie> = []
+    public allZombies: Array<Zombie> = []
     public levelUpFee: number = 0.001 * 10 ** 18
 
 
@@ -32,14 +33,27 @@ export default class Wallet extends VuexModule {
     @Mutation
     public setZombies(zombies: Array<ZombieInput>) {
         this.zombies = zombies.map(zombie => ({
-            id: zombie.id.toNumber(),
+            id: parseInt(zombie.id.toString()),
             name: zombie.name,
-            dna: zombie.dna.toNumber(),
+            dna: parseInt(zombie.dna.toString()),
             level: zombie.level,
             winCount: zombie.winCount,
             lossCount: zombie.lossCount,
-            readyTime: zombie.readyTime
+            readyTime: zombie.readyTime,
         }))
+    }
+
+    @Mutation
+    public setAllZombies(zombies: Array<ZombieInput>) {
+        this.allZombies.push(...zombies.map(zombie => ({
+            id: parseInt(zombie.id.toString()),
+            name: zombie.name,
+            dna: parseInt(zombie.dna.toString()),
+            level: zombie.level,
+            winCount: zombie.winCount,
+            lossCount: zombie.lossCount,
+            readyTime: zombie.readyTime,
+        })))
     }
 
     @Mutation

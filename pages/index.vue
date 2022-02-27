@@ -1,7 +1,7 @@
 <template>
   <div>
-    <v-row v-if="zombies.length > 0">
-      <v-col v-for="(zombie, index) in zombies" :key="index" md="3" sm="6">
+    <v-row v-if="allZombies.length > 0">
+      <v-col v-for="(zombie, index) in allZombies" :key="index" md="3" sm="6">
         <zombie-character :zombie="zombie"></zombie-character>
         <v-card elevation="12">
           <div class="text-center">
@@ -22,7 +22,7 @@
       <span class="white--text">No CryptoZombies found.</span>
     </v-alert>
     <infinite-loading
-      v-if="zombies.length > 0"
+      v-if="allZombies.length > 0"
       spinner="bubbles"
       @infinite="infiniteScroll"
     >
@@ -35,10 +35,12 @@
 
 <script lang="ts">
 import { Contract } from 'ethers'
-import { Vue, Component } from 'nuxt-property-decorator'
+import { Vue, Component, namespace } from 'nuxt-property-decorator'
 import { provider, getCryptoZombiesContract } from '~/plugins/provider'
 import ZombieCharacter from '~/components/ZombieCharacter.vue'
 import { Zombie, ZombieInput } from '~/interfaces/zombie'
+
+const zombie = namespace('zombie')
 
 @Component({
   components: {
@@ -47,30 +49,22 @@ import { Zombie, ZombieInput } from '~/interfaces/zombie'
 })
 export default class Home extends Vue {
   cryptoZombieContract!: Contract
-
-  zombies: Array<Zombie> = []
-  startIndex: number = 0
   totalSize: number = 10
+
+  @zombie.State
+  allZombies!: Array<Zombie>
+
+  @zombie.Mutation
+  setAllZombies!: (zombies: Array<ZombieInput>) => void
 
   async created() {
     this.cryptoZombieContract = getCryptoZombiesContract(provider)
     try {
       const zombies = await this.cryptoZombieContract.getZombies(
-        this.startIndex,
+        this.allZombies.length,
         this.totalSize
       )
-      this.zombies = zombies.map((zombie: ZombieInput) => {
-        return {
-          id: zombie.id.toNumber(),
-          name: zombie.name,
-          dna: zombie.dna.toNumber(),
-          level: zombie.level,
-          winCount: zombie.winCount,
-          lossCount: zombie.lossCount,
-          readyTime: zombie.readyTime,
-        }
-      })
-      this.startIndex += this.zombies.length
+      this.setAllZombies(zombies)
     } catch (e) {
       console.log(e)
     }
@@ -79,24 +73,11 @@ export default class Home extends Vue {
   async infiniteScroll($state: any) {
     try {
       const zombies = await this.cryptoZombieContract.getZombies(
-        this.startIndex,
+        this.allZombies.length,
         this.totalSize
       )
       if (zombies.length > 0) {
-        this.zombies = this.zombies.concat(
-          zombies.map((zombie: ZombieInput) => {
-            return {
-              id: zombie.id.toNumber(),
-              name: zombie.name,
-              dna: zombie.dna.toNumber(),
-              level: zombie.level,
-              winCount: zombie.winCount,
-              lossCount: zombie.lossCount,
-              readyTime: zombie.readyTime,
-            }
-          })
-        )
-        this.startIndex += zombies.length
+        this.setAllZombies(zombies)
         $state.loaded()
       } else {
         $state.complete()
