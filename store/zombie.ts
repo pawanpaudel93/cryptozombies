@@ -65,7 +65,14 @@ export default class Wallet extends VuexModule {
     updateZombie(update: { id: number, data: object }) {
         const zombieIndex = this.zombies.findIndex(zombie => zombie.id === update.id)
         if (zombieIndex !== 1) {
-            Vue.set(this.zombies, zombieIndex, { ...this.zombies[zombieIndex], ...update.data })
+            const zombie = this.zombies[zombieIndex];
+            if (zombie.winCount) {
+                zombie.winCount++;
+            }
+            if (zombie.lossCount) {
+                zombie.lossCount++;
+            }
+            Vue.set(this.zombies, zombieIndex, { ...zombie, ...update.data })
         }
     }
 

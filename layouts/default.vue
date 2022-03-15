@@ -78,6 +78,12 @@ export default class Default extends Vue {
   @zombie.Mutation
   setContractAdmin!: (admin: string) => void
 
+  @zombie.Mutation
+  public addZombie!: (zombie: Zombie) => void
+
+  @zombie.Mutation
+  updateZombie!: (update: { id: number; data: object }) => void
+
   async loadZombies() {
     try {
       const zombies = await this.cryptoZombieContract.getZombiesByOwner(
@@ -146,6 +152,37 @@ export default class Default extends Vue {
               win ? 'won' : 'lose'
             } the attack!`
           )
+
+          if (win) {
+            this.updateZombie({
+              id: attackerId,
+              data: { winCount: true },
+            })
+          } else {
+            this.updateZombie({
+              id: targetId,
+              data: { lossCount: true },
+            })
+          }
+        }
+      }
+    )
+    this.cryptoZombieContract.on(
+      'NewZombie',
+      (creator, zombieId, name, dna, event) => {
+        if (event.blockNumber <= startBlockNumber) return
+        if (creator === this.connectedAddress) {
+          this.$toast.info(`You have created a new zombie #${zombieId}!`)
+          this.addZombie({
+            id: zombieId,
+            name,
+            dna,
+            level: 0,
+            winCount: 0,
+            lossCount: 0,
+            readyTime: parseInt((Date.now() / 1000 + 86400).toString()),
+          })
+          this.$router.push('/zombies')
         }
       }
     )

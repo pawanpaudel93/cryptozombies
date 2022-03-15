@@ -286,45 +286,16 @@ export default class Home extends Vue {
         this.zombie.id,
         this.zombieId
       )
-      const receipt = await attackTx.wait()
+      await attackTx.wait()
       this.updateZombie({
         id: this.zombie.id,
         data: {
           readyTime: parseInt((Date.now() / 1000 + 86400).toString()),
         },
       })
-      const events = receipt.events
-      if (events.length > 0) {
-        const newZombieEvent = events.find((e: any) => e.event === 'NewZombie')
-        const attackedEvent = events.find((e: any) => e.event === 'Attacked')
-        if (attackedEvent.args.win) {
-          this.updateZombie({
-            id: this.zombie.id,
-            data: { winCount: this.zombie.winCount + 1 },
-          })
-        } else {
-          this.updateZombie({
-            id: this.zombie.id,
-            data: { lossCount: this.zombie.lossCount + 1 },
-          })
-        }
-        this.$toast.success(
-          `You have successfully attacked the Zombie #${
-            this.zombieId
-          } and you have ${attackedEvent.args.win ? 'won' : 'lost'}`
-        )
-        if (newZombieEvent) {
-          this.addZombie({
-            id: newZombieEvent.args.zombieId,
-            name: newZombieEvent.args.name,
-            dna: newZombieEvent.args.dna,
-            level: 0,
-            winCount: 0,
-            lossCount: 0,
-            readyTime: parseInt((Date.now() / 1000 + 86400).toString()),
-          })
-        }
-      }
+      this.$toast.success(
+        "You've successfully attacked the Zombie #" + this.zombieId
+      )
       this.attackForm.reset()
     } catch (e) {
       this.$toast.error(

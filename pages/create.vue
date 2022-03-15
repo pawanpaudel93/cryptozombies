@@ -52,30 +52,15 @@ export default class Home extends Vue {
   @zombie.State
   zombies!: Zombie[]
 
-  @zombie.Mutation
-  public addZombie!: (zombie: Zombie) => void
-
   async create() {
     if (!this.form.validate()) return
     this.loading = true
     try {
       const tx = await this.cryptoZombieContract.createRandomZombie(this.name)
-      const receipt = await tx.wait()
-      this.$toast.success(`Congratulations. Zombie ${this.name} is created.`)
-      const events = receipt.events
-      if (events.length > 0) {
-        const event = events.find((e: any) => e.event === 'NewZombie')
-        this.addZombie({
-          id: event.args.zombieId,
-          name: event.args.name,
-          dna: event.args.dna,
-          level: 0,
-          winCount: 0,
-          lossCount: 0,
-          readyTime: parseInt((Date.now() / 1000 + 86400).toString()),
-        })
-      }
-      this.$router.push('/zombies')
+      await tx.wait()
+      this.$toast.success(
+        `Congratulations. Zombie ${this.name} will be ready in a few minutes.`
+      )
     } catch (e) {
       console.error('Create', e)
       this.$toast.error(`Failed to create zombie ${this.name}.`)
