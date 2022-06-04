@@ -136,13 +136,14 @@ export default class Default extends Vue {
       })
 
       const startBlockNumber = await provider.getBlockNumber()
-      this.cryptoZombieContract.on(
+      const cryptoZombieContract = getCryptoZombiesContract(provider)
+      cryptoZombieContract.on(
         'Attacked',
         (attackerId, targetId, target, win, event) => {
           if (event.blockNumber <= startBlockNumber) return
           if (target === this.connectedAddress) {
             this.$toast.info(
-              `You have been attacked by #${attackerId} and you ${
+              `You have been attacked by #${attackerId.toString()} and you ${
                 win ? 'won' : 'lose'
               } the attack!`
             )
@@ -161,12 +162,14 @@ export default class Default extends Vue {
           }
         }
       )
-      this.cryptoZombieContract.on(
+      cryptoZombieContract.on(
         'NewZombie',
         (creator, zombieId, name, dna, event) => {
           if (event.blockNumber <= startBlockNumber) return
           if (creator === this.connectedAddress) {
-            this.$toast.info(`You have created a new zombie #${zombieId}!`)
+            this.$toast.info(
+              `You have created a new zombie #${zombieId.toString()}!`
+            )
             this.addZombie({
               id: zombieId,
               name,
@@ -175,7 +178,7 @@ export default class Default extends Vue {
               winCount: BigNumber.from('0'),
               lossCount: BigNumber.from('0'),
               readyTime: BigNumber.from(
-                (new Date().getTime() / 1000 + 86400).toString()
+                Math.floor(new Date().getTime() / 1000 + 86400).toString()
               ),
             })
             this.$router.push('/zombies')
@@ -217,6 +220,13 @@ export default class Default extends Vue {
     this.$nuxt.$on('loadZombies', () => {
       this.loadZombies()
     })
+  }
+
+  beforeDestroy() {
+    this.$nuxt.$off('loadZombies')
+    try {
+      window.ethereum.removeAllListeners()
+    } catch (e) {}
   }
 }
 </script>

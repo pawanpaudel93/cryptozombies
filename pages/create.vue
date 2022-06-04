@@ -65,6 +65,7 @@ export default class Home extends Vue {
       this.$toast.success(
         `Congratulations. Zombie ${this.name} will be ready in a few minutes.`
       )
+      this.form.reset()
     } catch (e) {
       this.$toast.error(errorToast(e, `Failed to create zombie ${this.name}.`))
     }

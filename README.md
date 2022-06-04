@@ -7,9 +7,9 @@
 
 ---
 
-<p align="center"> CryptoZombies is a NFT based dApp which gives interface to create and collect random crypto zombies, attack other crypto zombies and also feed on crypto kitties to create mixed crypto kitty zombies.
-    <br> 
+<p align="center"> CryptoZombies is a blockchain based game which gives interface to create and collect random crypto zombies, attack other crypto zombies and also feed on crypto kitties to create mixed crypto kitty zombies.
 </p>
+<p align="center"><a href="https://cryptozombies.vercel.app/" target="_blank">Demo Link</a></p>
 
 ## 📝 Table of Contents
 - [📝 Table of Contents](#-table-of-contents)
@@ -48,8 +48,8 @@ yarn start
 
 ## ⛏️ Built Using <a name = "built_using"></a>
 
-- [Solidity](https://www.mongodb.com/) - Smart Contract Programming
-- [NuxtJs](https://expressjs.com/) - The Intuitive Vue Framework
+- [Solidity](https://soliditylang.org/) - Smart Contract Programming
+- [NuxtJs](https://nuxtjs.org/) - The Intuitive Vue Framework
 - [Alchemy](https://www.alchemy.com/) - Web3 Development Tools
 
 ## ✍️ Authors <a name = "authors"></a>
