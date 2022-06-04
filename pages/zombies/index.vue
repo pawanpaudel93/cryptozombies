@@ -21,7 +21,7 @@
         </v-card>
       </v-col>
     </v-row>
-    <v-alert v-else outlined type="info" class="mt-6">
+    <v-alert v-else outlined type="info" color="primary" class="mt-6">
       You have 0 zombies.
     </v-alert>
   </v-container>

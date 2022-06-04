@@ -15,13 +15,13 @@
       <v-spacer></v-spacer>
       <div class="hidden-sm-and-down">
         <v-btn v-if="!isConnected" color="primary" @click="connect"
-          >Connect</v-btn
+          >Sign In</v-btn
         >
-        <v-btn v-if="isConnected" class="mr-2" color="info">{{
+        <v-btn v-if="isConnected" class="mr-2" color="warning" outlined>{{
           address
         }}</v-btn>
-        <v-btn v-if="isConnected" color="warning" @click="disconnect"
-          >Disconnect</v-btn
+        <v-btn v-if="isConnected" color="red" @click="disconnect"
+          >Sign Out</v-btn
         >
       </div>
       <v-menu offset-y>
@@ -33,6 +33,11 @@
           ></v-app-bar-nav-icon>
         </template>
         <v-list>
+          <v-list-item v-if="isConnected">
+            <v-list-item-title>
+              <v-btn block class="my-2" text>{{ address }}</v-btn>
+            </v-list-item-title>
+          </v-list-item>
           <v-list-item v-if="isConnected">
             <v-list-item-title>
               <v-btn color="primary" to="/create" outlined block
@@ -57,11 +62,6 @@
               <v-btn to="/admin" outlined block>Admin</v-btn>
             </v-list-item-title>
           </v-list-item>
-          <v-list-item v-if="isConnected">
-            <v-list-item-title>
-              <v-btn outlined block class="my-2">{{ address }}</v-btn>
-            </v-list-item-title>
-          </v-list-item>
           <v-list-item>
             <v-list-item-title>
               <v-btn
@@ -70,15 +70,15 @@
                 outlined
                 block
                 @click="connect"
-                >Connect</v-btn
+                >Sign In</v-btn
               >
               <v-btn
                 v-if="isConnected"
-                color="warning"
+                color="red"
                 outlined
                 block
                 @click="disconnect"
-                >Disconnect</v-btn
+                >Sign Out</v-btn
               >
             </v-list-item-title>
           </v-list-item>
@@ -92,9 +92,10 @@
 <script lang="ts">
 import { Vue, Component, namespace } from 'nuxt-property-decorator'
 import InvalidChain from './InvalidChain.vue'
-import { getProvider } from '~/plugins/utils'
+import { getProvider, errorToast } from '~/plugins/utils'
 const wallet = namespace('wallet')
 const zombie = namespace('zombie')
+declare let window: any
 
 @Component({
   components: {
@@ -126,24 +127,26 @@ export default class Header extends Vue {
 
   async connect(): Promise<void> {
     try {
-      const provider = getProvider(true)
-      await provider.send('eth_requestAccounts', [])
-      this.setConnectedAddress(await provider.getSigner().getAddress())
+      if (typeof window.ethereum === 'undefined') {
+        throw new TypeError('Please install Metamask.')
+      }
+      await window.ethereum.send('eth_requestAccounts', [])
+      this.setConnectedAddress(await getProvider(true).getSigner().getAddress())
       this.setConnected(true)
       this.$nuxt.$emit('loadZombies')
       localStorage.setItem('isConnected', 'true')
     } catch (e) {
-      console.error('Header', e)
+      this.$toast.error(errorToast(e, 'Please install Metamask.'))
     }
   }
 
   get address(): string {
     if (this.connectedAddress) {
-      const address =
-        this.connectedAddress.slice(0, 4) +
+      return (
+        this.connectedAddress.slice(0, 6) +
         '...' +
-        this.connectedAddress.slice(-3)
-      return address
+        this.connectedAddress.slice(-4)
+      )
     }
     return ''
   }
