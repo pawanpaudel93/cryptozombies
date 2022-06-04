@@ -1,68 +1,62 @@
-# cryptozombies
+<p align="center">
+  <a href="" rel="noopener">
+ <img src="assets/images/home.jpg" alt="CryptoZombies"></a>
+</p>
 
-## Build Setup
+<h3 align="center">CryptoZombies</h3>
 
-```bash
-# install dependencies
-$ yarn install
+---
 
-# serve with hot reload at localhost:3000
-$ yarn dev
+<p align="center"> CryptoZombies is a NFT based dApp which gives interface to create and collect random crypto zombies, attack other crypto zombies and also feed on crypto kitties to create mixed crypto kitty zombies.
+    <br> 
+</p>
 
-# build for production and launch server
-$ yarn build
-$ yarn start
+## 📝 Table of Contents
+- [📝 Table of Contents](#-table-of-contents)
+- [Installing <a name = "installing"></a>](#installing-)
+- [🚀 Deployment <a name = "deployment"></a>](#-deployment-)
+- [⛏️ Built Using <a name = "built_using"></a>](#️-built-using-)
+- [✍️ Authors <a name = "authors"></a>](#️-authors-)
+- [🎉 Thanks <a name = "thanks"></a>](#-thanks-)
 
-# generate static project
-$ yarn generate
+
+ > Note: The cryptozombies contract is currently deployed on Rinkeby Testnet.
+
+## Installing <a name = "installing"></a>
+Install the dependencies.
+```
+yarn install
 ```
 
-For detailed explanation on how things work, check out the [documentation](https://nuxtjs.org).
+And set the environment varibles.
 
-## Special Directories
+```
+ALCHEMY_API_KEY=<API_KEY>
+CONTRACT_ADDRESS=<CRYPTOZOMBIES_CONTRACT_ADDRESS>
+```
 
-You can create the following extra directories, some of which have special behaviors. Only `pages` is required; you can delete them if you don't want to use their functionality.
+## 🚀 Deployment <a name = "deployment"></a>
 
-### `assets`
+```bash
+# serve with hot reload at localhost:3000
+yarn dev
 
-The assets directory contains your uncompiled assets such as Stylus or Sass files, images, or fonts.
+# build for production and launch server
+yarn build
+yarn start
+```
 
-More information about the usage of this directory in [the documentation](https://nuxtjs.org/docs/2.x/directory-structure/assets).
+## ⛏️ Built Using <a name = "built_using"></a>
 
-### `components`
+- [Solidity](https://www.mongodb.com/) - Smart Contract Programming
+- [NuxtJs](https://expressjs.com/) - The Intuitive Vue Framework
+- [Alchemy](https://www.alchemy.com/) - Web3 Development Tools
 
-The components directory contains your Vue.js components. Components make up the different parts of your page and can be reused and imported into your pages, layouts and even other components.
+## ✍️ Authors <a name = "authors"></a>
 
-More information about the usage of this directory in [the documentation](https://nuxtjs.org/docs/2.x/directory-structure/components).
+- [@pawanpaudel93](https://github.com/pawanpaudel93)
 
-### `layouts`
+See also the list of [contributors](https://github.com/pawanpaudel93/cryptozombies/contributors) who participated in this project.
 
-Layouts are a great help when you want to change the look and feel of your Nuxt app, whether you want to include a sidebar or have distinct layouts for mobile and desktop.
-
-More information about the usage of this directory in [the documentation](https://nuxtjs.org/docs/2.x/directory-structure/layouts).
-
-### `pages`
-
-This directory contains your application views and routes. Nuxt will read all the `*.vue` files inside this directory and setup Vue Router automatically.
-
-More information about the usage of this directory in [the documentation](https://nuxtjs.org/docs/2.x/get-started/routing).
-
-### `plugins`
-
-The plugins directory contains JavaScript plugins that you want to run before instantiating the root Vue.js Application. This is the place to add Vue plugins and to inject functions or constants. Every time you need to use `Vue.use()`, you should create a file in `plugins/` and add its path to plugins in `nuxt.config.js`.
-
-More information about the usage of this directory in [the documentation](https://nuxtjs.org/docs/2.x/directory-structure/plugins).
-
-### `static`
-
-This directory contains your static files. Each file inside this directory is mapped to `/`.
-
-Example: `/static/robots.txt` is mapped as `/robots.txt`.
-
-More information about the usage of this directory in [the documentation](https://nuxtjs.org/docs/2.x/directory-structure/static).
-
-### `store`
-
-This directory contains your Vuex store files. Creating a file in this directory automatically activates Vuex.
-
-More information about the usage of this directory in [the documentation](https://nuxtjs.org/docs/2.x/directory-structure/store).
+## 🎉 Thanks <a name = "thanks"></a>
+- [CryptoZombies](https://cryptozombies.io)
