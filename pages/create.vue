@@ -2,7 +2,7 @@
   <v-container class="mt-5">
     <v-card elevation="12">
       <v-card-title> Create a Random Zombie </v-card-title>
-      <v-card-text v-if="zombies.length == 0">
+      <v-card-text v-if="!zombieRequested">
         <v-form ref="form" @submit.prevent="create">
           <v-text-field
             v-model="name"
@@ -34,8 +34,8 @@
 
 <script lang="ts">
 import { Vue, Component, Ref, namespace } from 'nuxt-property-decorator'
-import { Contract } from 'ethers'
-import { provider, getCryptoZombiesContract } from '~/plugins/provider'
+import { Contract, Signer } from 'ethers'
+import { getProvider, getCryptoZombiesContract } from '~/plugins/utils'
 import { Zombie } from '~/interfaces/zombie'
 
 const zombie = namespace('zombie')
@@ -45,7 +45,7 @@ export default class Home extends Vue {
   cryptoZombieContract!: Contract
   name: string = ''
   loading: boolean = false
-  zombiesCount: number = 0
+  zombieRequested = true
 
   @Ref('form') readonly form!: HTMLFormElement
 
@@ -68,10 +68,22 @@ export default class Home extends Vue {
     this.loading = false
   }
 
+  async randomZombieRequested(signer: Signer) {
+    try {
+      this.zombieRequested =
+        await this.cryptoZombieContract.randomZombieRequested(
+          await signer.getAddress()
+        )
+    } catch (e) {
+      console.error('RandomZombieRequested', e)
+    }
+  }
+
   async mounted() {
     try {
-      const signer = await provider.getSigner()
+      const signer = await getProvider(true).getSigner()
       this.cryptoZombieContract = getCryptoZombiesContract(signer)
+      await this.randomZombieRequested(signer)
     } catch (e) {
       console.error('Create Mounted', e)
     }

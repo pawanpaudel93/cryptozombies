@@ -1,6 +1,7 @@
+import { BigNumber } from 'ethers';
 import { Vue } from 'nuxt-property-decorator';
 import { Module, VuexModule, Mutation } from 'vuex-module-decorators'
-import { Zombie, ZombieInput } from '~/interfaces/zombie'
+import { Zombie } from '~/interfaces/zombie'
 @Module({
     name: 'zombie',
     stateFactory: true,
@@ -31,11 +32,11 @@ export default class Wallet extends VuexModule {
     }
 
     @Mutation
-    public setZombies(zombies: Array<ZombieInput>) {
+    public setZombies(zombies: Array<Zombie>) {
         this.zombies = zombies.map(zombie => ({
-            id: parseInt(zombie.id.toString()),
+            id: zombie.id,
             name: zombie.name,
-            dna: parseInt(zombie.dna.toString()),
+            dna: zombie.dna,
             level: zombie.level,
             winCount: zombie.winCount,
             lossCount: zombie.lossCount,
@@ -44,11 +45,11 @@ export default class Wallet extends VuexModule {
     }
 
     @Mutation
-    public setAllZombies(zombies: Array<ZombieInput>) {
+    public setAllZombies(zombies: Array<Zombie>) {
         this.allZombies.push(...zombies.map(zombie => ({
-            id: parseInt(zombie.id.toString()),
+            id: zombie.id,
             name: zombie.name,
-            dna: parseInt(zombie.dna.toString()),
+            dna: zombie.dna,
             level: zombie.level,
             winCount: zombie.winCount,
             lossCount: zombie.lossCount,
@@ -62,15 +63,16 @@ export default class Wallet extends VuexModule {
     }
 
     @Mutation
-    updateZombie(update: { id: number, data: object }) {
-        const zombieIndex = this.zombies.findIndex(zombie => zombie.id === update.id)
+    updateZombie(update: { id: BigNumber, data: Object & { win?: boolean, loss?: boolean } }) {
+        const zombieIndex = this.zombies.findIndex(zombie => zombie.id.eq(update.id))
         if (zombieIndex !== 1) {
             const zombie = this.zombies[zombieIndex];
-            if (zombie.winCount) {
-                zombie.winCount++;
-            }
-            if (zombie.lossCount) {
-                zombie.lossCount++;
+            if (update.data.win) {
+                zombie.winCount.add(1)
+                delete update.data.win;
+            } else if (update.data.loss) {
+                zombie.lossCount.add(1)
+                delete update.data.loss;
             }
             Vue.set(this.zombies, zombieIndex, { ...zombie, ...update.data })
         }
@@ -78,7 +80,7 @@ export default class Wallet extends VuexModule {
 
     @Mutation
     removeZombie(id: number) {
-        const zombieIndex = this.zombies.findIndex(zombie => zombie.id === id)
+        const zombieIndex = this.zombies.findIndex(zombie => zombie.id.eq(id))
         if (zombieIndex !== 1) {
             this.zombies.splice(zombieIndex, 1)
         }

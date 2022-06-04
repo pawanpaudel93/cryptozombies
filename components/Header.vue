@@ -85,21 +85,29 @@
         </v-list>
       </v-menu>
     </v-toolbar>
+    <InvalidChain v-if="!isChainSupported && !isConnected" />
   </div>
 </template>
 
 <script lang="ts">
 import { Vue, Component, namespace } from 'nuxt-property-decorator'
-import { provider } from '~/plugins/provider'
-
+import InvalidChain from './InvalidChain.vue'
+import { getProvider } from '~/plugins/utils'
 const wallet = namespace('wallet')
 const zombie = namespace('zombie')
 
-@Component
+@Component({
+  components: {
+    InvalidChain,
+  },
+})
 export default class Header extends Vue {
   appTitle: string = 'CryptoZombies'
   @wallet.State
   public isConnected!: boolean
+
+  @wallet.State
+  public isChainSupported!: boolean
 
   @wallet.State
   public supportedChainIds!: number[]
@@ -118,11 +126,12 @@ export default class Header extends Vue {
 
   async connect(): Promise<void> {
     try {
+      const provider = getProvider(true)
       await provider.send('eth_requestAccounts', [])
-      const signer = provider.getSigner()
-      this.setConnectedAddress(await signer.getAddress())
+      this.setConnectedAddress(await provider.getSigner().getAddress())
       this.setConnected(true)
       this.$nuxt.$emit('loadZombies')
+      localStorage.setItem('isConnected', 'true')
     } catch (e) {
       console.error('Header', e)
     }
@@ -145,6 +154,7 @@ export default class Header extends Vue {
 
   disconnect(): void {
     this.setConnected(false)
+    localStorage.setItem('isConnected', 'false')
   }
 }
 </script>

@@ -12,37 +12,39 @@
       </v-col>
       <v-col cols="12" md="8">
         <v-card
-          outlined
           shaped
+          outlined
           elevation="24"
-          :style="{
-            marginTop: $vuetify.breakpoint.mdAndUp ? '130px' : '',
-          }"
+          :style="{ marginTop: $vuetify.breakpoint.mdAndUp ? '130px' : '' }"
           align="center"
         >
           <v-card-text>
             <v-row>
               <v-col cols="6" class="font-weight-medium">ID: </v-col>
-              <v-col cols="6" class="font-weight-bold">{{ zombie.id }}</v-col>
+              <v-col cols="6" class="font-weight-bold">{{
+                zombie.id.toString()
+              }}</v-col>
               <v-col cols="6" class="font-weight-medium">Name: </v-col>
               <v-col cols="6" class="font-weight-bold">{{ zombie.name }}</v-col>
               <v-col cols="6" class="font-weight-medium">DNA: </v-col>
-              <v-col cols="6" class="font-weight-bold">{{ zombie.dna }}</v-col>
+              <v-col cols="6" class="font-weight-bold">{{
+                zombie.dna.toString()
+              }}</v-col>
               <v-col cols="6" class="font-weight-medium">Level: </v-col>
               <v-col cols="6" class="font-weight-bold">{{
-                zombie.level
+                zombie.level.toString()
               }}</v-col>
               <v-col cols="6" class="font-weight-medium">Win Count: </v-col>
               <v-col cols="6" class="font-weight-bold">{{
-                zombie.winCount
+                zombie.winCount.toString()
               }}</v-col>
               <v-col cols="6" class="font-weight-medium">Loss Count: </v-col>
               <v-col cols="6" class="font-weight-bold">{{
-                zombie.lossCount
+                zombie.lossCount.toString()
               }}</v-col>
               <v-col cols="6">Ready Time: </v-col>
               <v-col cols="6" class="font-weight-bold">{{
-                new Date(zombie.readyTime * 1000)
+                formattedReadyTime
               }}</v-col>
             </v-row>
           </v-card-text>
@@ -61,8 +63,8 @@
               :loading="levelLoading"
               :disabled="levelLoading"
               @click="levelUp"
-              >Level Up</v-btn
-            >
+              >Level Up
+            </v-btn>
           </v-col>
           <v-col md="4" cols="12" class="text-center px-12 py-6">
             <v-form ref="feed" @submit.prevent="feed">
@@ -132,8 +134,10 @@
                 label="New Zombie DNA"
                 :rules="[
                   (v) => !!v || 'Zombie DNA is required',
-                  (v) => v.length === 16 || 'Zombie DNA must be 16 numbers',
-                  (v) => /^[0-9]+$/.test(v) || 'Zombie DNA must be numbers',
+                  (v) =>
+                    (!!v && v.length === 16) || 'Zombie DNA must be 16 numbers',
+                  (v) =>
+                    (!!v && /^[0-9]+$/.test(v)) || 'Zombie DNA must be numbers',
                 ]"
               >
               </v-text-field>
@@ -173,8 +177,8 @@
                 :loading="transferLoading"
                 :disabled="transferLoading"
                 @click="transfer"
-                >Transfer</v-btn
-              >
+                >Transfer
+              </v-btn>
             </div>
           </v-form>
         </v-container>
@@ -184,9 +188,9 @@
 </template>
 
 <script lang="ts">
-import { Contract } from 'ethers'
+import { BigNumber, Contract } from 'ethers'
 import { Vue, Component, Ref, namespace } from 'nuxt-property-decorator'
-import { provider, getCryptoZombiesContract } from '~/plugins/provider'
+import { getProvider, getCryptoZombiesContract } from '~/plugins/utils'
 import ZombieCharacter from '~/components/ZombieCharacter.vue'
 import { Zombie } from '~/interfaces/zombie'
 
@@ -214,13 +218,13 @@ export default class Home extends Vue {
   transferAddress: string = ''
   cryptoZombieContract!: Contract
   zombie: Zombie = {
-    id: -1,
+    id: BigNumber.from('-1'),
     name: 'Zombie is not available with this ID',
-    dna: 0,
-    level: 0,
-    winCount: 0,
-    lossCount: 0,
-    readyTime: Date.now() / 1000,
+    dna: BigNumber.from('0'),
+    level: BigNumber.from('0'),
+    winCount: BigNumber.from('0'),
+    lossCount: BigNumber.from('0'),
+    readyTime: BigNumber.from('0'),
   }
 
   @Ref('feed')
@@ -239,6 +243,9 @@ export default class Home extends Vue {
   transferForm!: HTMLFormElement
 
   @wallet.State
+  isConnected!: boolean
+
+  @wallet.State
   connectedAddress!: string
 
   @zombie.State
@@ -248,10 +255,10 @@ export default class Home extends Vue {
   levelUpFee!: number
 
   @zombie.Mutation
-  updateZombie!: (update: { id: number; data: object }) => void
+  updateZombie!: (update: { id: BigNumber; data: object }) => void
 
   @zombie.Mutation
-  removeZombie!: (id: number) => void
+  removeZombie!: (id: BigNumber) => void
 
   @zombie.Mutation
   addZombie!: (zombie: Zombie) => void
@@ -273,7 +280,6 @@ export default class Home extends Vue {
       this.$toast.error(
         "You've failed to feed on the Crypto Kitty #" + this.kittyId
       )
-      console.log('feed', e)
     }
     this.feedLoading = false
   }
@@ -301,7 +307,6 @@ export default class Home extends Vue {
       this.$toast.error(
         "You've failed to attack the Crypto Zombie #" + this.zombieId
       )
-      console.log('feed', e)
     }
     this.attackLoading = false
   }
@@ -330,7 +335,6 @@ export default class Home extends Vue {
         "You've failed to change the name of the Crypto Zombie #" +
           this.zombie.id
       )
-      console.log('feed', e)
     }
     this.nameLoading = false
   }
@@ -346,9 +350,10 @@ export default class Home extends Vue {
       await nameTx.wait()
       this.updateZombie({
         id: this.zombie.id,
-        data: { dna: parseInt(this.dna) },
+        data: { dna: BigNumber.from(this.dna) },
       })
-      this.zombie.dna = parseInt(this.dna)
+      this.zombie.dna = BigNumber.from(this.dna)
+      this.dna = ''
       this.dnaForm.reset()
       this.$toast.success(
         "You've successfully changed the DNA of the Crypto Zombie #" +
@@ -359,7 +364,6 @@ export default class Home extends Vue {
         "You've failed to change the DNA of the Crypto Zombie #" +
           this.zombie.id
       )
-      console.log('feed', e)
     }
     this.dnaLoading = false
   }
@@ -376,9 +380,9 @@ export default class Home extends Vue {
       await levelUpTx.wait()
       this.updateZombie({
         id: this.zombie.id,
-        data: { level: this.zombie.level + 1 },
+        data: { level: this.zombie.level.add(1) },
       })
-      this.zombie.level++
+      this.zombie.level = this.zombie.level.add(1)
       this.$toast.success(
         "You've successfully leveled up the Crypto Zombie #" + this.zombieId
       )
@@ -386,7 +390,7 @@ export default class Home extends Vue {
       this.$toast.error(
         "You've failed to level up the Crypto Zombie #" + this.zombieId
       )
-      console.log('feed', e)
+      console.log(e)
     }
     this.levelLoading = false
   }
@@ -407,40 +411,61 @@ export default class Home extends Vue {
       this.$toast.success(
         "You've successfully transferred the Crypto Zombie #" + this.zombieId
       )
-      this.transferForm.reset()
     } catch (e) {
       this.$toast.error(
         "You've failed to transfer the Crypto Zombie #" + this.zombieId
       )
-      console.log('feed', e)
     }
     this.transferLoading = false
   }
 
   get isReady() {
-    return this.zombie.readyTime < Date.now() / 1000
+    return this.zombie.readyTime.toNumber() < new Date().getTime() / 1000
+  }
+
+  get formattedReadyTime() {
+    return new Date(this.zombie.readyTime.toNumber() * 1000).toLocaleString()
+  }
+
+  async fetchZombie() {
+    try {
+      const zombie = await this.cryptoZombieContract.zombies(
+        this.$route.params.id
+      )
+      this.zombie = {
+        id: zombie.id,
+        name: zombie.name,
+        dna: zombie.dna,
+        level: zombie.level,
+        winCount: zombie.winCount,
+        lossCount: zombie.lossCount,
+        readyTime: zombie.readyTime,
+      }
+    } catch (e) {
+      console.log(e)
+    }
   }
 
   async mounted() {
-    const signer = provider.getSigner()
-    this.cryptoZombieContract = getCryptoZombiesContract(signer)
-    const zombieIndex = this.zombies.findIndex(
-      (zombie) => String(zombie.id) === this.$route.params.id
-    )
-    if (zombieIndex !== -1) {
-      this.isOwner = true
-      this.zombie = this.zombies[zombieIndex]
-    } else {
-      this.isOwner =
-        (await this.cryptoZombieContract.ownerOf(this.$route.params.id)) ===
-        this.connectedAddress
-      try {
-        this.zombie = await this.cryptoZombieContract.zombies(
-          this.$route.params.id
-        )
-      } catch (e) {
-        console.log('Id', e)
+    try {
+      this.cryptoZombieContract = getCryptoZombiesContract(
+        getProvider(true).getSigner()
+      )
+      const zombieIndex = this.zombies.findIndex(
+        (zombie) => String(zombie.id) === this.$route.params.id
+      )
+      if (zombieIndex !== -1) {
+        this.isOwner = true
+        this.zombie = { ...this.zombies[zombieIndex] }
+      } else {
+        this.isOwner =
+          (await this.cryptoZombieContract.ownerOf(this.$route.params.id)) ===
+          this.connectedAddress
+        await this.fetchZombie()
       }
+    } catch (e) {
+      this.cryptoZombieContract = getCryptoZombiesContract(getProvider(true))
+      await this.fetchZombie()
     }
   }
 }

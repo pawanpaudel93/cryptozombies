@@ -58,7 +58,11 @@
 <script lang="ts">
 import { Vue, Component, namespace, Ref } from 'nuxt-property-decorator'
 import { Contract } from 'ethers'
-import { provider, getCryptoZombiesContract } from '~/plugins/provider'
+import {
+  getProvider,
+  getCryptoZombiesContract,
+  errorToast,
+} from '~/plugins/utils'
 
 const zombie = namespace('zombie')
 const wallet = namespace('wallet')
@@ -102,7 +106,7 @@ export default class Home extends Vue {
       this.$toast.success('Kitty contract address updated')
       await updateTx.wait()
     } catch (e) {
-      this.$toast.error("Couldn't update kitty contract address")
+      errorToast(e, "Couldn't update kitty contract address")
     }
     this.loading.kittyContractAddress = false
   }
@@ -117,7 +121,7 @@ export default class Home extends Vue {
       await updateTx.wait()
       this.$toast.success('Level up fee updated')
     } catch (e) {
-      this.$toast.error("Couldn't update level up fee")
+      errorToast(e, "Couldn't update level up fee")
     }
     this.loading.levelUpFee = false
   }
@@ -129,7 +133,7 @@ export default class Home extends Vue {
       await withdrawTx.wait()
       this.$toast.success('Withdraw completed')
     } catch (e) {
-      this.$toast.error('Withdraw failed')
+      errorToast(e, 'Withdraw failed')
     }
     this.loading.withdraw = false
   }
@@ -140,7 +144,7 @@ export default class Home extends Vue {
 
   async mounted() {
     try {
-      const signer = await provider.getSigner()
+      const signer = await getProvider(true).getSigner()
       this.cryptoZombieContract = getCryptoZombiesContract(signer)
     } catch (e) {
       console.error('Create Mounted', e)

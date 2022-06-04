@@ -178,7 +178,7 @@ export default class ZombieCharacter extends Vue {
   }
 
   zombieLoaded() {
-    window.setTimeout(() => {
+    setTimeout(() => {
       this.isZombieLoaded = true
     }, 1000)
   }

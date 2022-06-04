@@ -2,21 +2,8 @@
   <v-app>
     <Header />
     <v-main>
-      <v-container v-if="$route.name === 'index'" fluid class="px-10">
+      <v-container fluid class="px-10">
         <Nuxt />
-      </v-container>
-      <v-container
-        v-else-if="isChainSupported && isConnected"
-        fluid
-        class="px-10"
-      >
-        <Nuxt />
-      </v-container>
-      <v-container v-else-if="isChainSupported && !isConnected">
-        <NotConnected />
-      </v-container>
-      <v-container v-else>
-        <InvalidChain />
       </v-container>
     </v-main>
   </v-app>
@@ -24,11 +11,9 @@
 
 <script lang="ts">
 import { Vue, Component, namespace } from 'nuxt-property-decorator'
-import { Contract } from 'ethers'
-import { provider, getCryptoZombiesContract } from '~/plugins/provider'
+import { BigNumber, Contract } from 'ethers'
+import { getProvider, getCryptoZombiesContract } from '~/plugins/utils'
 import Header from '@/components/Header.vue'
-import NotConnected from '@/components/NotConnected.vue'
-import InvalidChain from '@/components/InvalidChain.vue'
 import { Zombie } from '~/interfaces/zombie'
 declare let window: any
 
@@ -38,8 +23,6 @@ const zombie = namespace('zombie')
 @Component({
   components: {
     Header,
-    NotConnected,
-    InvalidChain,
   },
 })
 export default class Default extends Vue {
@@ -104,7 +87,7 @@ export default class Default extends Vue {
 
   async fetchContractOwner() {
     try {
-      const owner = await getCryptoZombiesContract(provider).owner()
+      const owner = await getCryptoZombiesContract(getProvider()).owner()
       this.setContractAdmin(owner)
     } catch (e) {
       console.log(e)
@@ -112,99 +95,116 @@ export default class Default extends Vue {
   }
 
   async startListeners() {
-    window.ethereum.on('accountsChanged', (accounts: string[]) => {
-      if (accounts.length > 0) {
-        this.setConnectedAddress(accounts[0])
-        this.setConnected(true)
-        this.loadZombies()
-      } else {
-        this.setConnected(false)
-      }
-    })
-
-    window.ethereum.on('chainChanged', async (chainId: string) => {
-      if (this.supportedChainIds.includes(parseInt(chainId, 16))) {
+    if (
+      typeof window !== 'undefined' &&
+      typeof window.ethereum !== 'undefined'
+    ) {
+      const provider = getProvider(true)
+      window.ethereum.on('accountsChanged', async (accounts: string[]) => {
         try {
-          const signer = this.connectedAddress
-            ? await provider.getSigner(this.connectedAddress)
-            : await provider.getSigner()
-          this.setConnectedAddress(await signer.getAddress())
-          this.setConnected(true)
+          if (accounts.length > 0) {
+            const provider = getProvider(true)
+            await provider.send('eth_requestAccounts', [])
+            this.setConnectedAddress(await provider.getSigner().getAddress())
+            this.setConnected(true)
+            this.loadZombies()
+          } else {
+            this.setConnected(false)
+          }
         } catch (e) {
+          console.error('Header', e)
+        }
+      })
+
+      window.ethereum.on('chainChanged', async (chainId: string) => {
+        if (this.supportedChainIds.includes(parseInt(chainId, 16))) {
+          try {
+            const signer = this.connectedAddress
+              ? await provider.getSigner(this.connectedAddress)
+              : await provider.getSigner()
+            this.setConnectedAddress(await signer.getAddress())
+            this.setConnected(true)
+          } catch (e) {
+            this.setConnected(false)
+          }
+          this.setChainSupported(true)
+        } else {
+          this.setChainSupported(false)
           this.setConnected(false)
         }
-        this.setChainSupported(true)
-      } else {
-        this.setChainSupported(false)
-        this.setConnected(false)
-      }
-      this.loadZombies()
-    })
+        this.loadZombies()
+      })
 
-    const startBlockNumber = await provider.getBlockNumber()
-    this.cryptoZombieContract.on(
-      'Attacked',
-      (attackerId, targetId, target, win, event) => {
-        if (event.blockNumber <= startBlockNumber) return
-        if (target === this.connectedAddress) {
-          this.$toast.info(
-            `You have been attacked by #${attackerId} and you ${
-              win ? 'won' : 'lose'
-            } the attack!`
-          )
+      const startBlockNumber = await provider.getBlockNumber()
+      this.cryptoZombieContract.on(
+        'Attacked',
+        (attackerId, targetId, target, win, event) => {
+          if (event.blockNumber <= startBlockNumber) return
+          if (target === this.connectedAddress) {
+            this.$toast.info(
+              `You have been attacked by #${attackerId} and you ${
+                win ? 'won' : 'lose'
+              } the attack!`
+            )
 
-          if (win) {
-            this.updateZombie({
-              id: attackerId,
-              data: { winCount: true },
-            })
-          } else {
-            this.updateZombie({
-              id: targetId,
-              data: { lossCount: true },
-            })
+            if (win) {
+              this.updateZombie({
+                id: attackerId,
+                data: { win: true },
+              })
+            } else {
+              this.updateZombie({
+                id: targetId,
+                data: { loss: true },
+              })
+            }
           }
         }
-      }
-    )
-    this.cryptoZombieContract.on(
-      'NewZombie',
-      (creator, zombieId, name, dna, event) => {
-        if (event.blockNumber <= startBlockNumber) return
-        if (creator === this.connectedAddress) {
-          this.$toast.info(`You have created a new zombie #${zombieId}!`)
-          this.addZombie({
-            id: zombieId,
-            name,
-            dna,
-            level: 0,
-            winCount: 0,
-            lossCount: 0,
-            readyTime: parseInt((Date.now() / 1000 + 86400).toString()),
-          })
-          this.$router.push('/zombies')
+      )
+      this.cryptoZombieContract.on(
+        'NewZombie',
+        (creator, zombieId, name, dna, event) => {
+          if (event.blockNumber <= startBlockNumber) return
+          if (creator === this.connectedAddress) {
+            this.$toast.info(`You have created a new zombie #${zombieId}!`)
+            this.addZombie({
+              id: zombieId,
+              name,
+              dna,
+              level: BigNumber.from('0'),
+              winCount: BigNumber.from('0'),
+              lossCount: BigNumber.from('0'),
+              readyTime: BigNumber.from(
+                (new Date().getTime() / 1000 + 86400).toString()
+              ),
+            })
+            this.$router.push('/zombies')
+          }
         }
-      }
-    )
+      )
+    }
   }
 
   async autoConnect() {
-    try {
-      const signer = this.connectedAddress
-        ? await provider.getSigner(this.connectedAddress)
-        : await provider.getSigner()
-      this.cryptoZombieContract = getCryptoZombiesContract(signer)
-      const { chainId } = await provider.getNetwork()
-      if (chainId && signer && this.supportedChainIds.includes(chainId)) {
-        this.setConnectedAddress(await signer.getAddress())
-        this.setConnected(true)
-        this.loadZombies()
-      } else {
-        this.setChainSupported(false)
+    if (localStorage.getItem('isConnected') === 'true') {
+      try {
+        const provider = getProvider(true)
+        const signer = this.connectedAddress
+          ? await provider.getSigner(this.connectedAddress)
+          : await provider.getSigner()
+        this.cryptoZombieContract = getCryptoZombiesContract(signer)
+        const { chainId } = await provider.getNetwork()
+        if (chainId && signer && this.supportedChainIds.includes(chainId)) {
+          this.setConnectedAddress(await signer.getAddress())
+          this.setConnected(true)
+          this.loadZombies()
+        } else {
+          this.setChainSupported(false)
+          this.setConnected(false)
+        }
+      } catch (e) {
         this.setConnected(false)
       }
-    } catch (e) {
-      this.setConnected(false)
     }
   }
 

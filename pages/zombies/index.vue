@@ -3,7 +3,7 @@
     <div class="text-center">
       <h3 class="white--text">My Crypto Zombies</h3>
     </div>
-    <v-row>
+    <v-row v-if="zombies.length > 0">
       <v-col
         v-for="(zombie, index) in zombies"
         :key="index"
@@ -21,6 +21,9 @@
         </v-card>
       </v-col>
     </v-row>
+    <v-alert v-else outlined type="info" class="mt-6">
+      You have 0 zombies.
+    </v-alert>
   </v-container>
 </template>
 
