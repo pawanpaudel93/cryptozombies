@@ -190,7 +190,11 @@
 <script lang="ts">
 import { BigNumber, Contract } from 'ethers'
 import { Vue, Component, Ref, namespace } from 'nuxt-property-decorator'
-import { getProvider, getCryptoZombiesContract } from '~/plugins/utils'
+import {
+  getProvider,
+  getCryptoZombiesContract,
+  errorToast,
+} from '~/plugins/utils'
 import ZombieCharacter from '~/components/ZombieCharacter.vue'
 import { Zombie } from '~/interfaces/zombie'
 
@@ -278,7 +282,10 @@ export default class Home extends Vue {
       this.feedForm.reset()
     } catch (e) {
       this.$toast.error(
-        "You've failed to feed on the Crypto Kitty #" + this.kittyId
+        errorToast(
+          e,
+          "You've failed to feed on the Crypto Kitty #" + this.kittyId
+        )
       )
     }
     this.feedLoading = false
@@ -305,7 +312,10 @@ export default class Home extends Vue {
       this.attackForm.reset()
     } catch (e) {
       this.$toast.error(
-        "You've failed to attack the Crypto Zombie #" + this.zombieId
+        errorToast(
+          e,
+          "You've failed to attack the Crypto Zombie #" + this.zombieId
+        )
       )
     }
     this.attackLoading = false
@@ -332,8 +342,11 @@ export default class Home extends Vue {
       )
     } catch (e) {
       this.$toast.error(
-        "You've failed to change the name of the Crypto Zombie #" +
-          this.zombie.id
+        errorToast(
+          e,
+          "You've failed to change the name of the Crypto Zombie #" +
+            this.zombie.id
+        )
       )
     }
     this.nameLoading = false
@@ -361,8 +374,11 @@ export default class Home extends Vue {
       )
     } catch (e) {
       this.$toast.error(
-        "You've failed to change the DNA of the Crypto Zombie #" +
-          this.zombie.id
+        errorToast(
+          e,
+          "You've failed to change the DNA of the Crypto Zombie #" +
+            this.zombie.id
+        )
       )
     }
     this.dnaLoading = false
@@ -388,9 +404,11 @@ export default class Home extends Vue {
       )
     } catch (e) {
       this.$toast.error(
-        "You've failed to level up the Crypto Zombie #" + this.zombieId
+        errorToast(
+          e,
+          "You've failed to level up the Crypto Zombie #" + this.zombieId
+        )
       )
-      console.log(e)
     }
     this.levelLoading = false
   }
@@ -413,7 +431,10 @@ export default class Home extends Vue {
       )
     } catch (e) {
       this.$toast.error(
-        "You've failed to transfer the Crypto Zombie #" + this.zombieId
+        errorToast(
+          e,
+          "You've failed to transfer the Crypto Zombie #" + this.zombieId
+        )
       )
     }
     this.transferLoading = false

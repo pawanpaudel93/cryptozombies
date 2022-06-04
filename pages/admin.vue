@@ -106,7 +106,7 @@ export default class Home extends Vue {
       this.$toast.success('Kitty contract address updated')
       await updateTx.wait()
     } catch (e) {
-      errorToast(e, "Couldn't update kitty contract address")
+      this.$toast.error(errorToast(e, "Couldn't update kitty contract address"))
     }
     this.loading.kittyContractAddress = false
   }
@@ -121,7 +121,7 @@ export default class Home extends Vue {
       await updateTx.wait()
       this.$toast.success('Level up fee updated')
     } catch (e) {
-      errorToast(e, "Couldn't update level up fee")
+      this.$toast.error(errorToast(e, "Couldn't update level up fee"))
     }
     this.loading.levelUpFee = false
   }
@@ -133,7 +133,7 @@ export default class Home extends Vue {
       await withdrawTx.wait()
       this.$toast.success('Withdraw completed')
     } catch (e) {
-      errorToast(e, 'Withdraw failed')
+      this.$toast.error(errorToast(e, 'Withdraw failed'))
     }
     this.loading.withdraw = false
   }

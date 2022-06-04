@@ -1,5 +1,5 @@
 import { ethers, providers, Contract } from 'ethers'
-import Vue from 'vue';
+import { serializeError } from 'eth-rpc-errors'
 import CryptoZombiesABI from '@/assets/json/CryptoZombiesABI.json'
 
 declare let window: any
@@ -25,11 +25,11 @@ export const getCryptoZombiesContract = (
     )
 
 export const errorToast = (error: any, message: string) => {
-    if (error?.data?.message) {
-        Vue.$toast.error(error.data.message)
+    error = serializeError(error)
+    if (error?.data?.originalError?.error?.message) {
+        return error.data.originalError.error.message
     } else if (error?.message) {
-        Vue.$toast.error(error.message)
-    } else {
-        Vue.$toast.error(message)
+        return error.message
     }
+    return message
 }

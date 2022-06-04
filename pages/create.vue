@@ -35,7 +35,11 @@
 <script lang="ts">
 import { Vue, Component, Ref, namespace } from 'nuxt-property-decorator'
 import { Contract, Signer } from 'ethers'
-import { getProvider, getCryptoZombiesContract } from '~/plugins/utils'
+import {
+  getProvider,
+  getCryptoZombiesContract,
+  errorToast,
+} from '~/plugins/utils'
 import { Zombie } from '~/interfaces/zombie'
 
 const zombie = namespace('zombie')
@@ -62,8 +66,7 @@ export default class Home extends Vue {
         `Congratulations. Zombie ${this.name} will be ready in a few minutes.`
       )
     } catch (e) {
-      console.error('Create', e)
-      this.$toast.error(`Failed to create zombie ${this.name}.`)
+      this.$toast.error(errorToast(e, `Failed to create zombie ${this.name}.`))
     }
     this.loading = false
   }
