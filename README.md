@@ -13,7 +13,7 @@
 
 ## 📝 Table of Contents
 - [📝 Table of Contents](#-table-of-contents)
-- [Installing <a name = "installing"></a>](#installing-)
+- [:sparkle: Installing <a name = "installing"></a>](#installing-)
 - [🚀 Deployment <a name = "deployment"></a>](#-deployment-)
 - [⛏️ Built Using <a name = "built_using"></a>](#️-built-using-)
 - [✍️ Authors <a name = "authors"></a>](#️-authors-)
