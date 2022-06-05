@@ -1,7 +1,7 @@
 <template>
   <v-app>
     <Header />
-    <v-main>
+    <v-main :class="{ 'mt-16': isChainSupported || isConnected }">
       <v-container fluid class="px-10">
         <Nuxt />
       </v-container>

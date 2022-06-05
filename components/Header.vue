@@ -1,6 +1,6 @@
 <template>
   <div>
-    <v-toolbar>
+    <v-app-bar fixed>
       <v-toolbar-title>
         <nuxt-link class="blue--text" to="/" tag="span" style="cursor: pointer">
           <b>{{ appTitle }}</b>
@@ -84,8 +84,8 @@
           </v-list-item>
         </v-list>
       </v-menu>
-    </v-toolbar>
-    <InvalidChain v-if="!isChainSupported && !isConnected" />
+    </v-app-bar>
+    <InvalidChain v-if="!isChainSupported && !isConnected" class="mt-16" />
   </div>
 </template>
 
