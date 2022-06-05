@@ -303,7 +303,9 @@ export default class Home extends Vue {
       this.updateZombie({
         id: this.zombie.id,
         data: {
-          readyTime: parseInt((Date.now() / 1000 + 86400).toString()),
+          readyTime: BigNumber.from(
+            Math.floor(new Date().getTime() / 1000 + 86400).toString()
+          ),
         },
       })
       this.$toast.success(
